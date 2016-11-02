@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2016. Embedded Real-Time Computation Lab Of UESTC.
+  ~
+  ~ 电子科技大学・信息与软件工程学院・嵌入式实时计算研究所
+  ~
+  ~ http://www.is.uestc.edu.cn
+  -->
+<beans xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+             http://www.springframework.org/schema/beans/spring-beans.xsd
+             http://www.springframework.org/schema/context
+             http://www.springframework.org/schema/context/spring-context.xsd
+             http://www.springframework.org/schema/mvc
+             http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+    <context:property-placeholder location="classpath:znsh.conf"/>
+    <context:annotation-config/>
+    <mvc:annotation-driven>
+        <mvc:message-converters register-defaults="true">
+            <bean class="org.springframework.http.converter.StringHttpMessageConverter">
+                <property name="supportedMediaTypes" value="text/plain;charset=UTF-8"/>
+            </bean>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
+    <context:component-scan base-package="uestc.ercl.znsh.platform"/>
+    <!-- Content-Type自动适配 -->
+    <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
+        <property name="messageConverters">
+            <list>
+                <bean class="org.springframework.http.converter.StringHttpMessageConverter">
+                    <constructor-arg value="UTF-8"/>
+                    <property name="supportedMediaTypes">
+                        <list>
+                            <value>text/plain;charset=UTF-8</value>
+                        </list>
+                    </property>
+                </bean>
+                <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+                    <property name="supportedMediaTypes">
+                        <list>
+                            <value>application/json;charset=UTF-8</value>
+                        </list>
+                    </property>
+                </bean>
+            </list>
+        </property>
+    </bean>
+    <!-- 拦截器 -->
+    <mvc:interceptors>
+        <!-- 系统管理接口身份认证 -->
+        <mvc:interceptor>
+            <mvc:mapping path="/api/admin/**"/>
+            <bean class="uestc.ercl.znsh.platform.interceptor.AdminOfSysAuthenticator"/>
+        </mvc:interceptor>
+        <!-- 应用管理接口身份认证 -->
+        <mvc:interceptor>
+            <mvc:mapping path="/api/**"/>
+            <mvc:exclude-mapping path="/api/admin/**"/>
+            <mvc:exclude-mapping path="/api/signup"/>
+            <mvc:exclude-mapping path="/api/signin"/>
+            <mvc:exclude-mapping path="/api/password"/>
+            <mvc:exclude-mapping path="/api/verify"/>
+            <bean class="uestc.ercl.znsh.platform.interceptor.AdminOfAppAuthenticator"/>
+        </mvc:interceptor>
+        <!-- 集群服务接口身份认证 -->
+        <mvc:interceptor>
+            <mvc:mapping path="/api/service/**"/>
+            <bean class="uestc.ercl.znsh.platform.interceptor.ClusterAuthenticator"/>
+        </mvc:interceptor>
+    </mvc:interceptors>
+    <!-- 数据源 -->
+    <bean name="oracleDataSource" class="oracle.jdbc.pool.OracleDataSource">
+        <property name="driverType" value="${oracle.driverType}"/>
+        <property name="serverName" value="${oracle.serverName}"/>
+        <property name="portNumber" value="${oracle.portNumber}"/>
+        <property name="databaseName" value="${oracle.databaseName}"/>
+        <property name="user" value="${oracle.user}"/>
+        <property name="password" value="${oracle.password}"/>
+    </bean>
+    <bean name="dataSource" class="com.zaxxer.hikari.HikariDataSource" destroy-method="close">
+        <property name="dataSource" ref="oracleDataSource"/>
+    </bean>
+    <bean name="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+</beans>

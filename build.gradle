@@ -1,0 +1,53 @@
+group 'uestc.ercl.znsh'
+version '0.1'
+
+apply plugin: 'java'
+apply plugin: 'war'
+
+ext {
+    maven_url = 'http://192.168.10.200:8081/repository/znsh'
+}
+ext {
+    ver_servlet = '3.1.0'
+    ver_spring = '4.3.0.RELEASE'
+    ver_jackson = '+'
+    ver_hikari = '+'
+    ver_pgjdbc = '+'
+    ver_redission = '+'
+    ver_log4j2 = '+'
+}
+
+repositories {
+    jcenter()
+    maven { url "${maven_url}" }
+    mavenLocal()
+}
+
+dependencies {
+    compile fileTree(dir: 'lib', include: ['*.jar'])
+    compile "uestc.ercl.znsh:znsh-common:+",
+            "javax.servlet:javax.servlet-api:${ver_servlet}",
+            "org.springframework:spring-webmvc:${ver_spring}",
+            "org.springframework:spring-jdbc:${ver_spring}",
+            "org.apache.logging.log4j:log4j-core:${ver_log4j2}",
+            "org.apache.logging.log4j:log4j-api:${ver_log4j2}",
+            "org.apache.logging.log4j:log4j-web:${ver_log4j2}",
+            "org.apache.logging.log4j:log4j-slf4j-impl:${ver_log4j2}",
+            "com.zaxxer:HikariCP:${ver_hikari}",
+            "cn.sel:shc:+"
+    testCompile 'junit:junit:+'
+}
+
+task copyOut(type: Copy, dependsOn: war) {
+    from 'build/libs'
+    into '/home/sel/桌面'
+    include '*.war'
+    rename 'znsh-platform.*\\.', 'platform.'
+}
+
+task deploy2Tomcat(type: Copy, dependsOn: war) {
+    from 'build/libs'
+    into '/home/sel/Programs/Tomcat/webapps'
+    include '*.war'
+    rename 'znsh-platform.*\\.', 'platform.'
+}

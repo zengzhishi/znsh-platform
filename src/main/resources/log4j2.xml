@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2016. Embedded Real-Time Computation Lab Of UESTC.
+  ~
+  ~ 电子科技大学・信息与软件工程学院・嵌入式实时计算研究所
+  ~
+  ~ http://www.is.uestc.edu.cn
+  -->
+<Configuration name="log4j2_uestc_ercl_znsh_sys" status="info" strict="true" monitorInterval="86400">
+    <Appenders>
+        <Console name="console" target="SYSTEM_OUT">
+            <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%p] %c.%M(%L) :: %m%n"/>
+        </Console>
+    </Appenders>
+    <Loggers>
+        <Root level="info">
+            <AppenderRef ref="console"/>
+        </Root>
+    </Loggers>
+</Configuration>
