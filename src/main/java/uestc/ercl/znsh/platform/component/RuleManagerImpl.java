@@ -1,9 +1,12 @@
 /*
  * Copyright (c) 2016. Embedded Real-Time Computation Lab Of UESTC.
  *
- * 电子科技大学・信息与软件工程学院・嵌入式实时计算研究所
- *
+ * 版权所有：电子科技大学・信息与软件工程学院・嵌入式实时计算研究所（简称ERCL）
  * http://www.is.uestc.edu.cn
+ *
+ * 未经许可，任何其他组织或个人不得将此程序——
+ * 1、用于商业用途。
+ * 2、修改或再发布。
  */
 package uestc.ercl.znsh.platform.component;
 
@@ -14,8 +17,8 @@ import uestc.ercl.znsh.common.constant.RuleStatus;
 import uestc.ercl.znsh.common.data.JsonUtil;
 import uestc.ercl.znsh.common.entity.Rule;
 import uestc.ercl.znsh.common.exception.ZNSH_DataAccessException;
+import uestc.ercl.znsh.common.exception.ZNSH_IllegalArgumentException;
 import uestc.ercl.znsh.common.exception.ZNSH_IllegalDataException;
-import uestc.ercl.znsh.common.exception.ZNSH_IllegalFieldValueException;
 import uestc.ercl.znsh.common.exception.ZNSH_InternalException;
 import uestc.ercl.znsh.platform.component.def.RuleManager;
 import uestc.ercl.znsh.platform.dao.RuleDAO;
@@ -46,13 +49,13 @@ public class RuleManagerImpl implements RuleManager
      *
      * @return 操作结束后的规则对象
      *
-     * @throws ZNSH_IllegalFieldValueException
+     * @throws ZNSH_IllegalArgumentException
      * @throws ZNSH_InternalException
      * @throws ZNSH_IllegalDataException
      */
     @Override
     public Rule setRule(int flag, String json, String appId, int creator)
-            throws ZNSH_IllegalFieldValueException, ZNSH_InternalException, ZNSH_IllegalDataException
+            throws ZNSH_IllegalArgumentException, ZNSH_InternalException, ZNSH_IllegalDataException
     {
         if(JText.isNullOrEmpty(json))
         {
@@ -67,7 +70,7 @@ public class RuleManagerImpl implements RuleManager
     }
 
     private Rule createRule(JsonNode jsonNode, String appId, int creator)
-            throws ZNSH_IllegalFieldValueException, ZNSH_InternalException
+            throws ZNSH_IllegalArgumentException, ZNSH_InternalException
     {
         Rule rule = new Rule();
         setRuleFields(rule, jsonNode);
@@ -79,7 +82,7 @@ public class RuleManagerImpl implements RuleManager
     }
 
     private Rule updateRule(JsonNode jsonNode)
-            throws ZNSH_InternalException, ZNSH_IllegalFieldValueException
+            throws ZNSH_InternalException, ZNSH_IllegalArgumentException
     {
         String pk = jsonNode.get("pk").asText("");
         Rule rule = dao.select(pk);
@@ -95,7 +98,7 @@ public class RuleManagerImpl implements RuleManager
     }
 
     private void setRuleFields(Rule rule, JsonNode fields)
-            throws ZNSH_IllegalFieldValueException, ZNSH_InternalException
+            throws ZNSH_IllegalArgumentException, ZNSH_InternalException
     {
         rule.setName(fields.get("name").asText(null));
         rule.setDesc(fields.get("desc").asText(null));

@@ -2,9 +2,12 @@
 <!--
   ~ Copyright (c) 2016. Embedded Real-Time Computation Lab Of UESTC.
   ~
-  ~ 电子科技大学・信息与软件工程学院・嵌入式实时计算研究所
-  ~
+  ~ 版权所有：电子科技大学・信息与软件工程学院・嵌入式实时计算研究所（简称ERCL）
   ~ http://www.is.uestc.edu.cn
+  ~
+  ~ 未经许可，任何其他组织或个人不得将此程序——
+  ~ 1、用于商业用途。
+  ~ 2、修改或再发布。
   -->
 <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="3.0"
          xmlns="http://java.sun.com/xml/ns/javaee"
@@ -17,6 +20,14 @@
     <listener>
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
     </listener>
+    <filter>
+        <filter-name>httpPutFormContentFilter</filter-name>
+        <filter-class>org.springframework.web.filter.HttpPutFormContentFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>httpPutFormContentFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
     <filter>
         <filter-name>encodingFilter</filter-name>
         <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>

@@ -1,9 +1,12 @@
 /*
  * Copyright (c) 2016. Embedded Real-Time Computation Lab Of UESTC.
  *
- * 电子科技大学・信息与软件工程学院・嵌入式实时计算研究所
- *
+ * 版权所有：电子科技大学・信息与软件工程学院・嵌入式实时计算研究所（简称ERCL）
  * http://www.is.uestc.edu.cn
+ *
+ * 未经许可，任何其他组织或个人不得将此程序——
+ * 1、用于商业用途。
+ * 2、修改或再发布。
  */
 package uestc.ercl.znsh.platform.component;
 
@@ -27,7 +30,7 @@ import uestc.ercl.znsh.common.entity.App;
 import uestc.ercl.znsh.common.entity.Cluster;
 import uestc.ercl.znsh.common.entity.Config;
 import uestc.ercl.znsh.common.exception.ZNSH_DataAccessException;
-import uestc.ercl.znsh.common.exception.ZNSH_IllegalFieldValueException;
+import uestc.ercl.znsh.common.exception.ZNSH_IllegalArgumentException;
 import uestc.ercl.znsh.common.exception.ZNSH_ServiceException;
 import uestc.ercl.znsh.platform.component.def.AppManager;
 import uestc.ercl.znsh.platform.component.def.SysConfigManager;
@@ -104,7 +107,7 @@ public class AppManagerImpl implements AppManager
     @Override
     public void create(@NonNull String name, @Nullable String desc, @NonNull AppType type, @NonNull AppStatus status, @NonNull String master,
             @NonNull String pid, @NonNull String phone, @Nullable String email, @NonNull String account, @NonNull String password)
-            throws ZNSH_IllegalFieldValueException, ZNSH_ServiceException
+            throws ZNSH_IllegalArgumentException, ZNSH_ServiceException
     {
         Date now = new Date();
         App app = new App(newAppId(name), name, desc, type.value(), status.value(), now, now, master, pid, phone, email, account, password);
@@ -133,14 +136,9 @@ public class AppManagerImpl implements AppManager
         }
     }
 
-    private String newAppId(String name)
-    {
-        return SecureUtil.getMD5_16(name);
-    }
-
     @Override
     public App get(@Nullable String appId)
-            throws ZNSH_IllegalFieldValueException, ZNSH_ServiceException
+            throws ZNSH_IllegalArgumentException, ZNSH_ServiceException
     {
         try
         {
@@ -154,7 +152,7 @@ public class AppManagerImpl implements AppManager
 
     @Override
     public App find(@Nullable String key)
-            throws ZNSH_IllegalFieldValueException, ZNSH_ServiceException
+            throws ZNSH_IllegalArgumentException, ZNSH_ServiceException
     {
         try
         {
@@ -169,7 +167,7 @@ public class AppManagerImpl implements AppManager
     @Override
     public List<App> find(@Nullable String pk, @Nullable String name, @Nullable AppType type, @Nullable AppStatus status, @Nullable String master,
             @Nullable String pid, @Nullable String phone, @Nullable String email, int from, int count)
-            throws ZNSH_IllegalFieldValueException, ZNSH_ServiceException
+            throws ZNSH_IllegalArgumentException, ZNSH_ServiceException
     {
         if(from < 0)
         {
@@ -192,7 +190,7 @@ public class AppManagerImpl implements AppManager
     @Override
     public void update(@NonNull String pk, @Nullable String name, @Nullable String desc, @Nullable String master, @Nullable String pid,
             @Nullable String phone, @Nullable String email, @Nullable String account)
-            throws ZNSH_IllegalFieldValueException, ZNSH_ServiceException
+            throws ZNSH_IllegalArgumentException, ZNSH_ServiceException
     {
         App app = new App();
         app.setPk(pk);
@@ -214,12 +212,12 @@ public class AppManagerImpl implements AppManager
             LOGGER.error("更新应用信息失败！", e);
             throw new ZNSH_ServiceException("更新应用信息失败！", e);
         }
-        throw new ZNSH_IllegalFieldValueException("未选择应用！");
+        throw new ZNSH_IllegalArgumentException("未选择应用！");
     }
 
     @Override
     public void updatePassword(@NonNull String pk, @NonNull String password)
-            throws ZNSH_IllegalFieldValueException, ZNSH_ServiceException
+            throws ZNSH_IllegalArgumentException, ZNSH_ServiceException
     {
         App app = new App();
         app.setPk(pk);
@@ -239,11 +237,11 @@ public class AppManagerImpl implements AppManager
 
     @Override
     public Map<String, String> delete(@NonNull String... pks)
-            throws ZNSH_IllegalFieldValueException, ZNSH_ServiceException
+            throws ZNSH_IllegalArgumentException, ZNSH_ServiceException
     {
         if(pks == null || pks.length <= 0)
         {
-            throw new ZNSH_IllegalFieldValueException("未选择应用！");
+            throw new ZNSH_IllegalArgumentException("未选择应用！");
         } else
         {
             Map<String, String> fails = disable(pks);
@@ -260,14 +258,14 @@ public class AppManagerImpl implements AppManager
 
     @Override
     public Map<String, String> setType(@NonNull AppType type, @NonNull String... pks)
-            throws ZNSH_IllegalFieldValueException, ZNSH_ServiceException
+            throws ZNSH_IllegalArgumentException, ZNSH_ServiceException
     {
         if(type == null)
         {
-            throw new ZNSH_IllegalFieldValueException("未指定应用类型！");
+            throw new ZNSH_IllegalArgumentException("未指定应用类型！");
         } else if(pks == null || pks.length <= 0)
         {
-            throw new ZNSH_IllegalFieldValueException("未选择应用！");
+            throw new ZNSH_IllegalArgumentException("未选择应用！");
         } else
         {
             Map<String, String> fails = new HashMap<>();
@@ -295,11 +293,11 @@ public class AppManagerImpl implements AppManager
 
     @Override
     public Map<String, String> review(boolean accept, @NonNull String... pks)
-            throws ZNSH_IllegalFieldValueException, ZNSH_ServiceException
+            throws ZNSH_IllegalArgumentException, ZNSH_ServiceException
     {
         if(pks == null || pks.length <= 0)
         {
-            throw new ZNSH_IllegalFieldValueException("未选择应用！");
+            throw new ZNSH_IllegalArgumentException("未选择应用！");
         } else
         {
             Map<String, String> fails = new HashMap<>();
@@ -327,11 +325,11 @@ public class AppManagerImpl implements AppManager
 
     @Override
     public Map<String, String> setCluster(Integer clusterPk, String... pks)
-            throws ZNSH_IllegalFieldValueException, ZNSH_ServiceException
+            throws ZNSH_IllegalArgumentException, ZNSH_ServiceException
     {
         if(pks == null || pks.length <= 0)
         {
-            throw new ZNSH_IllegalFieldValueException("未选择应用！");
+            throw new ZNSH_IllegalArgumentException("未选择应用！");
         } else
         {
             Map<String, String> fails = new HashMap<>();
@@ -344,11 +342,11 @@ public class AppManagerImpl implements AppManager
 
     @Override
     public Map<String, String> activate(@NonNull String... pks)
-            throws ZNSH_IllegalFieldValueException, ZNSH_ServiceException
+            throws ZNSH_IllegalArgumentException, ZNSH_ServiceException
     {
         if(pks == null || pks.length <= 0)
         {
-            throw new ZNSH_IllegalFieldValueException("未选择应用！");
+            throw new ZNSH_IllegalArgumentException("未选择应用！");
         } else
         {
             Map<String, String> fails = new HashMap<>();
@@ -381,11 +379,11 @@ public class AppManagerImpl implements AppManager
 
     @Override
     public Map<String, String> suspend(@NonNull String... pks)
-            throws ZNSH_IllegalFieldValueException, ZNSH_ServiceException
+            throws ZNSH_IllegalArgumentException, ZNSH_ServiceException
     {
         if(pks == null || pks.length <= 0)
         {
-            throw new ZNSH_IllegalFieldValueException("未选择应用！");
+            throw new ZNSH_IllegalArgumentException("未选择应用！");
         } else
         {
             Map<String, String> result = new HashMap<>();
@@ -418,11 +416,11 @@ public class AppManagerImpl implements AppManager
 
     @Override
     public Map<String, String> disable(@NonNull String... pks)
-            throws ZNSH_IllegalFieldValueException, ZNSH_ServiceException
+            throws ZNSH_IllegalArgumentException, ZNSH_ServiceException
     {
         if(pks == null || pks.length <= 0)
         {
-            throw new ZNSH_IllegalFieldValueException("未选择应用！");
+            throw new ZNSH_IllegalArgumentException("未选择应用！");
         } else
         {
             Map<String, String> result = new HashMap<>();
@@ -511,5 +509,10 @@ public class AppManagerImpl implements AppManager
             requestHolder.post(REQ_ID_SUSPEND, cluster.appCtlUrl(), handler);
         }
         return false;
+    }
+
+    private String newAppId(String name)
+    {
+        return SecureUtil.getMD5_16(name);
     }
 }

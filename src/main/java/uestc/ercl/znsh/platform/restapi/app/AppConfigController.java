@@ -1,9 +1,12 @@
 /*
  * Copyright (c) 2016. Embedded Real-Time Computation Lab Of UESTC.
  *
- * 电子科技大学・信息与软件工程学院・嵌入式实时计算研究所
- *
+ * 版权所有：电子科技大学・信息与软件工程学院・嵌入式实时计算研究所（简称ERCL）
  * http://www.is.uestc.edu.cn
+ *
+ * 未经许可，任何其他组织或个人不得将此程序——
+ * 1、用于商业用途。
+ * 2、修改或再发布。
  */
 package uestc.ercl.znsh.platform.restapi.app;
 
@@ -11,12 +14,9 @@ import cn.sel.jutil.lang.JText;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.Assert;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import uestc.ercl.znsh.common.entity.Config;
-import uestc.ercl.znsh.common.exception.ZNSH_IllegalFieldValueException;
+import uestc.ercl.znsh.common.exception.ZNSH_IllegalArgumentException;
 import uestc.ercl.znsh.platform.component.AppManagerImpl;
 import uestc.ercl.znsh.platform.component.def.AppManager;
 import uestc.ercl.znsh.platform.restapi.BaseController;
@@ -42,10 +42,10 @@ public class AppConfigController extends BaseController
 
     @ResponseBody
     @RequestMapping(path = "set", method = RequestMethod.PUT)
-    public String set(HttpServletRequest request, HttpServletResponse response, @RequestParam String name, @RequestParam String value)
+    public String set(HttpServletRequest request, HttpServletResponse response, @RequestAttribute String appId, @RequestParam String name,
+            @RequestParam String value)
             throws IOException
     {
-        String appId = getAppId(request);
         if(JText.isNormal(appId))
         {
             try
@@ -62,7 +62,7 @@ public class AppConfigController extends BaseController
                 {
                     response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "设置配置失败！");
                 }
-            } catch(ZNSH_IllegalFieldValueException e)
+            } catch(ZNSH_IllegalArgumentException e)
             {
                 response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "系统异常！");
             }
@@ -75,10 +75,9 @@ public class AppConfigController extends BaseController
 
     @ResponseBody
     @RequestMapping(path = "find", method = RequestMethod.GET)
-    public Config get(HttpServletRequest request, HttpServletResponse response, @RequestParam String name)
+    public Config get(HttpServletRequest request, HttpServletResponse response, @RequestAttribute String appId, @RequestParam String name)
             throws IOException
     {
-        String appId = getAppId(request);
         if(JText.isNormal(appId))
         {
             Config config = appManager.getConfig(appId, name);
@@ -98,10 +97,9 @@ public class AppConfigController extends BaseController
 
     @ResponseBody
     @RequestMapping(path = "list", method = RequestMethod.GET)
-    public List<Config> list(HttpServletRequest request, HttpServletResponse response)
+    public List<Config> list(HttpServletRequest request, HttpServletResponse response, @RequestAttribute String appId)
             throws IOException
     {
-        String appId = getAppId(request);
         if(JText.isNormal(appId))
         {
             List<Config> list = appManager.getConfigList(appId);

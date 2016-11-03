@@ -1,6 +1,6 @@
 <component name="CopyrightManager">
   <copyright>
     <option name="myName" value="Copyright_ERCL" />
-    <option name="notice" value="Copyright (c) &amp;#36;today.year. Embedded Real-Time Computation Lab Of UESTC.&#10;&#10;电子科技大学・信息与软件工程学院・嵌入式实时计算研究所&#10;&#10;http://www.is.uestc.edu.cn" />
+    <option name="notice" value="Copyright (c) &amp;#36;today.year. Embedded Real-Time Computation Lab Of UESTC.&#10;&#10;版权所有：电子科技大学・信息与软件工程学院・嵌入式实时计算研究所（简称ERCL）&#10;http://www.is.uestc.edu.cn&#10;&#10;未经许可，任何其他组织或个人不得将此程序——&#10;1、用于商业用途。&#10;2、修改或再发布。" />
   </copyright>
 </component>

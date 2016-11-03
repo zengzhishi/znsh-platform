@@ -1,9 +1,12 @@
 /*
  * Copyright (c) 2016. Embedded Real-Time Computation Lab Of UESTC.
  *
- * 电子科技大学・信息与软件工程学院・嵌入式实时计算研究所
- *
+ * 版权所有：电子科技大学・信息与软件工程学院・嵌入式实时计算研究所（简称ERCL）
  * http://www.is.uestc.edu.cn
+ *
+ * 未经许可，任何其他组织或个人不得将此程序——
+ * 1、用于商业用途。
+ * 2、修改或再发布。
  */
 package uestc.ercl.znsh.platform.restapi.service;
 
@@ -15,7 +18,7 @@ import uestc.ercl.znsh.common.constant.DataType;
 import uestc.ercl.znsh.common.constant.JobType;
 import uestc.ercl.znsh.common.data.JsonUtil;
 import uestc.ercl.znsh.common.entity.*;
-import uestc.ercl.znsh.common.exception.ZNSH_IllegalFieldValueException;
+import uestc.ercl.znsh.common.exception.ZNSH_IllegalArgumentException;
 import uestc.ercl.znsh.common.exception.ZNSH_InternalException;
 import uestc.ercl.znsh.common.security.Authenticator;
 import uestc.ercl.znsh.common.security.TokenRole;
@@ -60,7 +63,7 @@ public class ResourceController extends BaseController
             map.put("sheets", SimulatedResource.sheets());
             map.put("jobs", SimulatedResource.jobs());
             map.put("warnings", SimulatedResource.warnings());
-        } catch(ZNSH_IllegalFieldValueException e)
+        } catch(ZNSH_IllegalArgumentException e)
         {
             response.sendError(400, "非法参数！" + e);
         } catch(ZNSH_InternalException e)
@@ -88,7 +91,7 @@ public class ResourceController extends BaseController
     public static class SimulatedResource
     {
         public static App app()
-                throws ZNSH_IllegalFieldValueException
+                throws ZNSH_IllegalArgumentException
         {
             App app = new App();
             app.setPk("TestApp");
@@ -123,7 +126,7 @@ public class ResourceController extends BaseController
         }
 
         public static List<Job> jobs()
-                throws IOException, ZNSH_IllegalFieldValueException, ZNSH_InternalException
+                throws IOException, ZNSH_IllegalArgumentException, ZNSH_InternalException
         {
             ArrayList<Job> jobs = new ArrayList<>();
             Job job = new Job();
@@ -138,7 +141,7 @@ public class ResourceController extends BaseController
         }
 
         public static HashMap<Integer, Rule> getRules()
-                throws IOException, ZNSH_IllegalFieldValueException, ZNSH_InternalException
+                throws IOException, ZNSH_IllegalArgumentException, ZNSH_InternalException
         {
             Properties properties = new Properties();
             properties.load(ResourceController.class.getClassLoader().getResource("rule.properties").openStream());
@@ -167,7 +170,7 @@ public class ResourceController extends BaseController
         }
 
         public static List<Sheet> sheets()
-                throws ZNSH_IllegalFieldValueException
+                throws ZNSH_IllegalArgumentException
         {
             //-----------------------------------------------------
             Field f_id = new Field();

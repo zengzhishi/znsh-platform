@@ -1,9 +1,12 @@
 /*
  * Copyright (c) 2016. Embedded Real-Time Computation Lab Of UESTC.
  *
- * 电子科技大学・信息与软件工程学院・嵌入式实时计算研究所
- *
+ * 版权所有：电子科技大学・信息与软件工程学院・嵌入式实时计算研究所（简称ERCL）
  * http://www.is.uestc.edu.cn
+ *
+ * 未经许可，任何其他组织或个人不得将此程序——
+ * 1、用于商业用途。
+ * 2、修改或再发布。
  */
 package uestc.ercl.znsh.platform.restapi.service;
 
@@ -18,7 +21,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import uestc.ercl.znsh.common.constant.AppStatus;
 import uestc.ercl.znsh.common.constant.AppType;
 import uestc.ercl.znsh.common.entity.App;
-import uestc.ercl.znsh.common.exception.ZNSH_IllegalFieldValueException;
+import uestc.ercl.znsh.common.exception.ZNSH_IllegalArgumentException;
 import uestc.ercl.znsh.common.exception.ZNSH_ServiceException;
 import uestc.ercl.znsh.platform.component.AppManagerImpl;
 import uestc.ercl.znsh.platform.component.VerifyManagerImpl;
@@ -80,7 +83,7 @@ public class OpenController extends BaseController
                                 break;
                         }
                         return "注册成功！";
-                    } catch(ZNSH_IllegalFieldValueException e)
+                    } catch(ZNSH_IllegalArgumentException e)
                     {
                         response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "注册应用失败！");
                     }
@@ -108,7 +111,7 @@ public class OpenController extends BaseController
         try
         {
             app = appManager.find(key);
-        } catch(ZNSH_IllegalFieldValueException e)
+        } catch(ZNSH_IllegalArgumentException e)
         {
             e.printStackTrace();
         } catch(ZNSH_ServiceException e)
@@ -144,6 +147,13 @@ public class OpenController extends BaseController
     }
 
     @ResponseBody
+    @RequestMapping(path = "signout", method = RequestMethod.POST)
+    public String signout(HttpServletRequest request, HttpServletResponse response)
+    {
+        return "您已成功退出！";
+    }
+
+    @ResponseBody
     @RequestMapping(path = "password", method = RequestMethod.POST)
     public String password(HttpServletRequest request, HttpServletResponse response, @RequestParam String key, @RequestParam String code,
             @RequestParam String pwd1, @RequestParam String pwd2)
@@ -153,7 +163,7 @@ public class OpenController extends BaseController
         try
         {
             app = appManager.find(key);
-        } catch(ZNSH_IllegalFieldValueException e)
+        } catch(ZNSH_IllegalArgumentException e)
         {
             e.printStackTrace();
         } catch(ZNSH_ServiceException e)
@@ -171,7 +181,7 @@ public class OpenController extends BaseController
                         try
                         {
                             appManager.updatePassword(appId, pwd1);
-                        } catch(ZNSH_IllegalFieldValueException e)
+                        } catch(ZNSH_IllegalArgumentException e)
                         {
                             e.printStackTrace();
                         } catch(ZNSH_ServiceException e)
@@ -205,7 +215,7 @@ public class OpenController extends BaseController
         try
         {
             app = appManager.find(key);
-        } catch(ZNSH_IllegalFieldValueException e)
+        } catch(ZNSH_IllegalArgumentException e)
         {
             e.printStackTrace();
         } catch(ZNSH_ServiceException e)

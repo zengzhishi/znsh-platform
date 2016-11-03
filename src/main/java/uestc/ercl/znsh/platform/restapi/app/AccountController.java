@@ -1,9 +1,12 @@
 /*
  * Copyright (c) 2016. Embedded Real-Time Computation Lab Of UESTC.
  *
- * 电子科技大学・信息与软件工程学院・嵌入式实时计算研究所
- *
+ * 版权所有：电子科技大学・信息与软件工程学院・嵌入式实时计算研究所（简称ERCL）
  * http://www.is.uestc.edu.cn
+ *
+ * 未经许可，任何其他组织或个人不得将此程序——
+ * 1、用于商业用途。
+ * 2、修改或再发布。
  */
 package uestc.ercl.znsh.platform.restapi.app;
 
@@ -11,13 +14,10 @@ import cn.sel.jutil.lang.JText;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.Assert;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import uestc.ercl.znsh.common.entity.App;
 import uestc.ercl.znsh.common.entity.Config;
-import uestc.ercl.znsh.common.exception.ZNSH_IllegalFieldValueException;
+import uestc.ercl.znsh.common.exception.ZNSH_IllegalArgumentException;
 import uestc.ercl.znsh.common.exception.ZNSH_ServiceException;
 import uestc.ercl.znsh.common.security.Token;
 import uestc.ercl.znsh.common.security.TokenRole;
@@ -49,17 +49,16 @@ public class AccountController extends BaseController
 
     @ResponseBody
     @RequestMapping(path = "app", method = RequestMethod.GET)
-    public App retrieve(HttpServletRequest request, HttpServletResponse response)
+    public App retrieve(HttpServletRequest request, HttpServletResponse response, @RequestAttribute String appId)
             throws IOException
     {
-        String appId = getAppId(request);
         if(JText.isNormal(appId))
         {
             App app = null;
             try
             {
                 app = appManager.get(appId);
-            } catch(ZNSH_IllegalFieldValueException e)
+            } catch(ZNSH_IllegalArgumentException e)
             {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST, "获取应用信息失败！原因：" + e.getMessage());
             } catch(ZNSH_ServiceException e)
@@ -80,18 +79,17 @@ public class AccountController extends BaseController
 
     @ResponseBody
     @RequestMapping(path = "app", method = RequestMethod.PUT)
-    public String update(HttpServletRequest request, HttpServletResponse response, String name, String desc, String master, String pid, String phone,
-            String email, String account)
+    public String update(HttpServletRequest request, HttpServletResponse response, @RequestAttribute String appId, String name, String desc,
+            String master, String pid, String phone, String email, String account)
             throws IOException
     {
-        String appId = getAppId(request);
         if(JText.isNormal(appId))
         {
             try
             {
                 appManager.update(appId, name, desc, master, pid, phone, email, account);
                 return "修改应用信息成功！";
-            } catch(ZNSH_IllegalFieldValueException e)
+            } catch(ZNSH_IllegalArgumentException e)
             {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST, "修改应用信息失败！原因：" + e.getMessage());
             } catch(ZNSH_ServiceException e)
@@ -108,10 +106,10 @@ public class AccountController extends BaseController
 
     @ResponseBody
     @RequestMapping(path = "password", method = RequestMethod.PUT)
-    public String password(HttpServletRequest request, HttpServletResponse response, @RequestParam String origPwd, @RequestParam String newPwd)
+    public String password(HttpServletRequest request, HttpServletResponse response, @RequestAttribute String appId, @RequestParam String origPwd,
+            @RequestParam String newPwd)
             throws IOException
     {
-        String appId = getAppId(request);
         if(JText.isNormal(appId))
         {
             try
@@ -131,7 +129,7 @@ public class AccountController extends BaseController
                 {
                     response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "修改密码失败！原因：系统异常！");
                 }
-            } catch(ZNSH_IllegalFieldValueException e)
+            } catch(ZNSH_IllegalArgumentException e)
             {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST, "修改密码失败！原因：" + e.getMessage());
             } catch(ZNSH_ServiceException e)
@@ -147,17 +145,16 @@ public class AccountController extends BaseController
 
     @ResponseBody
     @RequestMapping(path = "activate", method = RequestMethod.POST)
-    public String activate(HttpServletRequest request, HttpServletResponse response)
+    public String activate(HttpServletRequest request, HttpServletResponse response, @RequestAttribute String appId)
             throws IOException
     {
-        String appId = getAppId(request);
         if(JText.isNormal(appId))
         {
             try
             {
                 appManager.activate(appId);
                 return "激活应用成功！";
-            } catch(ZNSH_IllegalFieldValueException e)
+            } catch(ZNSH_IllegalArgumentException e)
             {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST, "激活应用失败！原因：" + e.getMessage());
             } catch(ZNSH_ServiceException e)
@@ -173,17 +170,16 @@ public class AccountController extends BaseController
 
     @ResponseBody
     @RequestMapping(path = "suspend", method = RequestMethod.POST)
-    public String suspend(HttpServletRequest request, HttpServletResponse response)
+    public String suspend(HttpServletRequest request, HttpServletResponse response, @RequestAttribute String appId)
             throws IOException
     {
-        String appId = getAppId(request);
         if(JText.isNormal(appId))
         {
             try
             {
                 appManager.suspend(appId);
                 return "挂起应用成功！";
-            } catch(ZNSH_IllegalFieldValueException e)
+            } catch(ZNSH_IllegalArgumentException e)
             {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST, "挂起应用失败！原因：" + e.getMessage());
             } catch(ZNSH_ServiceException e)
@@ -199,10 +195,9 @@ public class AccountController extends BaseController
 
     @ResponseBody
     @RequestMapping(path = "token", method = RequestMethod.PUT)
-    public String token(HttpServletRequest request, HttpServletResponse response, @RequestParam String key)
+    public String token(HttpServletRequest request, HttpServletResponse response, @RequestAttribute String appId, @RequestParam String key)
             throws IOException
     {
-        String appId = getAppId(request);
         if(JText.isNormal(appId))
         {
             Token token = new Token(appId, TokenRole.TERMINAL, key);
@@ -215,10 +210,9 @@ public class AccountController extends BaseController
                     return "设置TOKEN成功！";
                 }
                 response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "设置TOKEN失败！");
-            } catch(ZNSH_IllegalFieldValueException e)
+            } catch(ZNSH_IllegalArgumentException e)
             {
-                logger.error("为应用'{}'设置TOKEN失败！", e);
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "无法设置TOKEN！");
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "无法设置TOKEN！原因：");
             }
         } else
         {

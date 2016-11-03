@@ -1,9 +1,12 @@
 /*
  * Copyright (c) 2016. Embedded Real-Time Computation Lab Of UESTC.
  *
- * 电子科技大学・信息与软件工程学院・嵌入式实时计算研究所
- *
+ * 版权所有：电子科技大学・信息与软件工程学院・嵌入式实时计算研究所（简称ERCL）
  * http://www.is.uestc.edu.cn
+ *
+ * 未经许可，任何其他组织或个人不得将此程序——
+ * 1、用于商业用途。
+ * 2、修改或再发布。
  */
 package uestc.ercl.znsh.platform.component.def;
 
@@ -12,7 +15,7 @@ import cn.sel.jutil.annotation.note.Nullable;
 import uestc.ercl.znsh.common.constant.AppStatus;
 import uestc.ercl.znsh.common.constant.AppType;
 import uestc.ercl.znsh.common.entity.App;
-import uestc.ercl.znsh.common.exception.ZNSH_IllegalFieldValueException;
+import uestc.ercl.znsh.common.exception.ZNSH_IllegalArgumentException;
 import uestc.ercl.znsh.common.exception.ZNSH_ServiceException;
 
 import java.util.List;
@@ -35,11 +38,11 @@ public interface AppManager extends AppConfigManager
      * @param password 登录密码
      *
      * @throws ZNSH_ServiceException
-     * @throws ZNSH_IllegalFieldValueException
+     * @throws ZNSH_IllegalArgumentException
      */
     void create(@NonNull String name, @Nullable String desc, @NonNull AppType type, @NonNull AppStatus status, @NonNull String master,
             @NonNull String pid, @NonNull String phone, @Nullable String email, @NonNull String account, @NonNull String password)
-            throws ZNSH_IllegalFieldValueException, ZNSH_ServiceException;
+            throws ZNSH_IllegalArgumentException, ZNSH_ServiceException;
 
     /**
      * 根据应用编号（主键）检索应用信息
@@ -49,7 +52,7 @@ public interface AppManager extends AppConfigManager
      * @return 应用对象
      */
     App get(@Nullable String appId)
-            throws ZNSH_IllegalFieldValueException, ZNSH_ServiceException;
+            throws ZNSH_IllegalArgumentException, ZNSH_ServiceException;
 
     /**
      * 根据关键字查找应用信息
@@ -59,7 +62,7 @@ public interface AppManager extends AppConfigManager
      * @return 应用对象
      */
     App find(@Nullable String key)
-            throws ZNSH_IllegalFieldValueException, ZNSH_ServiceException;
+            throws ZNSH_IllegalArgumentException, ZNSH_ServiceException;
 
     /**
      * 查询应用列表
@@ -79,7 +82,7 @@ public interface AppManager extends AppConfigManager
      */
     List<App> find(@Nullable String pk, @Nullable String name, @Nullable AppType type, @Nullable AppStatus status, @Nullable String master,
             @Nullable String pid, @Nullable String phone, @Nullable String email, int from, int count)
-            throws ZNSH_IllegalFieldValueException, ZNSH_ServiceException;
+            throws ZNSH_IllegalArgumentException, ZNSH_ServiceException;
 
     /**
      * 更新应用信息
@@ -93,12 +96,12 @@ public interface AppManager extends AppConfigManager
      * @param email   责任人邮箱（置空时不改）
      * @param account 管理账号（置空时不改）
      *
-     * @throws ZNSH_IllegalFieldValueException
+     * @throws ZNSH_IllegalArgumentException
      * @throws ZNSH_ServiceException
      */
     void update(@NonNull String pk, @Nullable String name, @Nullable String desc, @Nullable String master, @Nullable String pid,
             @Nullable String phone, @Nullable String email, @Nullable String account)
-            throws ZNSH_IllegalFieldValueException, ZNSH_ServiceException;
+            throws ZNSH_IllegalArgumentException, ZNSH_ServiceException;
 
     /**
      * 更新应用密码
@@ -106,11 +109,11 @@ public interface AppManager extends AppConfigManager
      * @param pk       主键（应用编号）
      * @param password 密码
      *
-     * @throws ZNSH_IllegalFieldValueException
+     * @throws ZNSH_IllegalArgumentException
      * @throws ZNSH_ServiceException
      */
     void updatePassword(@NonNull String pk, @NonNull String password)
-            throws ZNSH_IllegalFieldValueException, ZNSH_ServiceException;
+            throws ZNSH_IllegalArgumentException, ZNSH_ServiceException;
 
     /**
      * 删除应用
@@ -120,7 +123,7 @@ public interface AppManager extends AppConfigManager
      * @return null-成功/else-失败项的pk及原因
      */
     Map<String, String> delete(@NonNull String... pks)
-            throws ZNSH_IllegalFieldValueException, ZNSH_ServiceException;
+            throws ZNSH_IllegalArgumentException, ZNSH_ServiceException;
 
     /**
      * @param type
@@ -129,7 +132,7 @@ public interface AppManager extends AppConfigManager
      * @return null-成功/else-失败项的pk及原因
      */
     Map<String, String> setType(@NonNull AppType type, @NonNull String... pks)
-            throws ZNSH_IllegalFieldValueException, ZNSH_ServiceException;
+            throws ZNSH_IllegalArgumentException, ZNSH_ServiceException;
 
     /**
      * 审核新应用（如批准，设置状态为{@link AppStatus#NORMAL}；否则设为{@link AppStatus#DISABLED}）
@@ -140,7 +143,7 @@ public interface AppManager extends AppConfigManager
      * @return null-成功/else-失败项的pk及原因
      */
     Map<String, String> review(boolean accept, @NonNull String... pks)
-            throws ZNSH_IllegalFieldValueException, ZNSH_ServiceException;
+            throws ZNSH_IllegalArgumentException, ZNSH_ServiceException;
 
     /**
      * 分配服务集群（通知原集群移除该应用、新集群添加该应用）
@@ -151,7 +154,7 @@ public interface AppManager extends AppConfigManager
      * @return null-成功/else-失败项的pk及原因
      */
     Map<String, String> setCluster(Integer clusterPk, String... pks)
-            throws ZNSH_IllegalFieldValueException, ZNSH_ServiceException;
+            throws ZNSH_IllegalArgumentException, ZNSH_ServiceException;
 
     /**
      * 激活应用（设置状态为{@link AppStatus#NORMAL}，并通知服务集群恢复对该应用的服务）
@@ -161,7 +164,7 @@ public interface AppManager extends AppConfigManager
      * @return null-成功/else-失败项的pk及原因
      */
     Map<String, String> activate(@NonNull String... pks)
-            throws ZNSH_IllegalFieldValueException, ZNSH_ServiceException;
+            throws ZNSH_IllegalArgumentException, ZNSH_ServiceException;
 
     /**
      * 挂起应用（设置状态为{@link AppStatus#SUSPEND}，并通知服务集群暂停对该应用的服务）
@@ -171,7 +174,7 @@ public interface AppManager extends AppConfigManager
      * @return null-成功/else-失败项的pk及原因
      */
     Map<String, String> suspend(@NonNull String... pks)
-            throws ZNSH_IllegalFieldValueException, ZNSH_ServiceException;
+            throws ZNSH_IllegalArgumentException, ZNSH_ServiceException;
 
     /**
      * 注销应用（设置状态为{@link AppStatus#DISABLED}，并通知服务集群移除该应用）
@@ -181,5 +184,5 @@ public interface AppManager extends AppConfigManager
      * @return null-成功/else-失败项的pk及原因
      */
     Map<String, String> disable(@NonNull String... pks)
-            throws ZNSH_IllegalFieldValueException, ZNSH_ServiceException;
+            throws ZNSH_IllegalArgumentException, ZNSH_ServiceException;
 }

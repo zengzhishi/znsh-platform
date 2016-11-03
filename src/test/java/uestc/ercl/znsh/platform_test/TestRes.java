@@ -1,14 +1,17 @@
 /*
  * Copyright (c) 2016. Embedded Real-Time Computation Lab Of UESTC.
  *
- * 电子科技大学・信息与软件工程学院・嵌入式实时计算研究所
- *
+ * 版权所有：电子科技大学・信息与软件工程学院・嵌入式实时计算研究所（简称ERCL）
  * http://www.is.uestc.edu.cn
+ *
+ * 未经许可，任何其他组织或个人不得将此程序——
+ * 1、用于商业用途。
+ * 2、修改或再发布。
  */
 package uestc.ercl.znsh.platform_test;
 
 import org.junit.Test;
-import uestc.ercl.znsh.common.exception.ZNSH_IllegalFieldValueException;
+import uestc.ercl.znsh.common.exception.ZNSH_IllegalArgumentException;
 import uestc.ercl.znsh.common.exception.ZNSH_InternalException;
 import uestc.ercl.znsh.platform.restapi.service.ResourceController;
 
@@ -32,7 +35,7 @@ public class TestRes
             map.put("jobs", ResourceController.SimulatedResource.jobs());
             map.put("warnings", ResourceController.SimulatedResource.warnings());
             System.out.print(map);
-        } catch(ZNSH_IllegalFieldValueException | ZNSH_InternalException e)
+        } catch(ZNSH_IllegalArgumentException | ZNSH_InternalException e)
         {
             e.printStackTrace();
         }

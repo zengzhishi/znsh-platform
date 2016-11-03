@@ -1,9 +1,12 @@
 /*
  * Copyright (c) 2016. Embedded Real-Time Computation Lab Of UESTC.
  *
- * 电子科技大学・信息与软件工程学院・嵌入式实时计算研究所
- *
+ * 版权所有：电子科技大学・信息与软件工程学院・嵌入式实时计算研究所（简称ERCL）
  * http://www.is.uestc.edu.cn
+ *
+ * 未经许可，任何其他组织或个人不得将此程序——
+ * 1、用于商业用途。
+ * 2、修改或再发布。
  */
 package uestc.ercl.znsh.platform.restapi.admin;
 
@@ -15,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import uestc.ercl.znsh.common.entity.Cluster;
-import uestc.ercl.znsh.common.exception.ZNSH_IllegalFieldValueException;
+import uestc.ercl.znsh.common.exception.ZNSH_IllegalArgumentException;
 import uestc.ercl.znsh.common.exception.ZNSH_ServiceException;
 import uestc.ercl.znsh.platform.component.ClusterManagerImpl;
 import uestc.ercl.znsh.platform.component.def.ClusterManager;
@@ -51,7 +54,7 @@ public class ClusterController extends BaseController
         {
             clusterManager.create(name, desc, url);
             return "添加集群成功！";
-        } catch(ZNSH_IllegalFieldValueException e)
+        } catch(ZNSH_IllegalArgumentException e)
         {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "添加集群失败！原因：" + e.getMessage());
         } catch(ZNSH_ServiceException e)
@@ -63,32 +66,14 @@ public class ClusterController extends BaseController
 
     @ResponseBody
     @RequestMapping(path = "cluster", method = RequestMethod.GET)
-    public Cluster retrieve(HttpServletRequest request, HttpServletResponse response, int pk)
-            throws IOException
-    {
-        try
-        {
-            return clusterManager.retrieve(pk);
-        } catch(ZNSH_IllegalFieldValueException e)
-        {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "查询集群信息失败！原因：" + e.getMessage());
-        } catch(ZNSH_ServiceException e)
-        {
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "查询集群信息失败！原因：" + e.getMessage());
-        }
-        return null;
-    }
-
-    @ResponseBody
-    @RequestMapping(path = "clusters", method = RequestMethod.GET)
-    public List<Cluster> retrieve(HttpServletRequest request, HttpServletResponse response, String pk, String name, String desc, String url, int from,
-            int count)
+    public List<Cluster> retrieve(HttpServletRequest request, HttpServletResponse response, String pk, String name, String desc, String url,
+            @RequestParam(defaultValue = "0") Integer from, @RequestParam(defaultValue = "20") Integer count)
             throws IOException
     {
         try
         {
             return clusterManager.retrieve(pk, name, desc, url, from, count);
-        } catch(ZNSH_IllegalFieldValueException e)
+        } catch(ZNSH_IllegalArgumentException e)
         {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "查询集群列表失败！原因：" + e.getMessage());
         } catch(ZNSH_ServiceException e)
@@ -100,14 +85,14 @@ public class ClusterController extends BaseController
 
     @ResponseBody
     @RequestMapping(path = "cluster", method = RequestMethod.PUT)
-    public String update(HttpServletRequest request, HttpServletResponse response, @RequestParam int pk, String name, String desc, String url)
+    public String update(HttpServletRequest request, HttpServletResponse response, @RequestParam Integer pk, String name, String desc, String url)
             throws IOException
     {
         try
         {
             clusterManager.update(pk, name, desc, url);
             return "修改集群信息成功！";
-        } catch(ZNSH_IllegalFieldValueException e)
+        } catch(ZNSH_IllegalArgumentException e)
         {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "修改集群信息失败！原因：" + e.getMessage());
         } catch(ZNSH_ServiceException e)
@@ -128,13 +113,13 @@ public class ClusterController extends BaseController
             try
             {
                 int[] clusterPks = new int[array.length];
-                for(int i = 0; i < array.length; i++)
+                for(Integer i = 0; i < array.length; i++)
                 {
                     clusterPks[i] = Integer.parseInt(array[i]);
                 }
                 clusterManager.delete(clusterPks);
                 return "删除集群成功！";
-            } catch(NumberFormatException | ZNSH_IllegalFieldValueException e)
+            } catch(NumberFormatException | ZNSH_IllegalArgumentException e)
             {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST, "删除集群失败！原因：" + e.getMessage());
             } catch(ZNSH_ServiceException e)

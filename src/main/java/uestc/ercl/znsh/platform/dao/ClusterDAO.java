@@ -1,9 +1,12 @@
 /*
  * Copyright (c) 2016. Embedded Real-Time Computation Lab Of UESTC.
  *
- * 电子科技大学・信息与软件工程学院・嵌入式实时计算研究所
- *
+ * 版权所有：电子科技大学・信息与软件工程学院・嵌入式实时计算研究所（简称ERCL）
  * http://www.is.uestc.edu.cn
+ *
+ * 未经许可，任何其他组织或个人不得将此程序——
+ * 1、用于商业用途。
+ * 2、修改或再发布。
  */
 package uestc.ercl.znsh.platform.dao;
 
@@ -14,6 +17,7 @@ import uestc.ercl.znsh.common.exception.ZNSH_DataAccessException;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * TODO 曾
@@ -41,6 +45,8 @@ public class ClusterDAO extends SuperDAO
         if(cluster != null)
         {
             //SQL
+            cluster.setPk(DB.clusterMap.size() + 1);
+            DB.clusterMap.put(cluster.getPk(), cluster);
             return true;
         }
         return false;
@@ -61,6 +67,7 @@ public class ClusterDAO extends SuperDAO
         if(cluster != null)
         {
             //SQL
+            DB.clusterMap.put(cluster.getPk(), cluster);
             return true;
         }
         return false;
@@ -81,6 +88,10 @@ public class ClusterDAO extends SuperDAO
         if(pks != null && pks.length > 0)
         {
             //SQL
+            for(int pk : pks)
+            {
+                DB.clusterMap.remove(pk);
+            }
             return null;
         }
         throw new ZNSH_DataAccessException();
@@ -104,7 +115,7 @@ public class ClusterDAO extends SuperDAO
             throws ZNSH_DataAccessException
     {
         //SQL
-        return null;
+        return DB.clusterMap.values().stream().collect(Collectors.toList());
     }
 
     /**
@@ -122,6 +133,7 @@ public class ClusterDAO extends SuperDAO
         if(pk > 0)
         {
             //SQL
+            return DB.clusterMap.get(pk);
         }
         return null;
     }

@@ -1,9 +1,12 @@
 /*
  * Copyright (c) 2016. Embedded Real-Time Computation Lab Of UESTC.
  *
- * 电子科技大学・信息与软件工程学院・嵌入式实时计算研究所
- *
+ * 版权所有：电子科技大学・信息与软件工程学院・嵌入式实时计算研究所（简称ERCL）
  * http://www.is.uestc.edu.cn
+ *
+ * 未经许可，任何其他组织或个人不得将此程序——
+ * 1、用于商业用途。
+ * 2、修改或再发布。
  */
 package uestc.ercl.znsh.platform.dao;
 
@@ -18,6 +21,7 @@ import uestc.ercl.znsh.common.exception.ZNSH_DataAccessException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * TODO 曾
@@ -45,6 +49,7 @@ public class AppDAO extends SuperDAO
         if(app != null)
         {
             //SQL
+            DB.appMap.put(app.getPk(), app);
             return true;
         }
         return false;
@@ -65,6 +70,7 @@ public class AppDAO extends SuperDAO
         if(app != null)
         {
             //SQL
+            DB.appMap.put(app.getPk(), app);
             return true;
         }
         return false;
@@ -85,6 +91,10 @@ public class AppDAO extends SuperDAO
         if(pks != null && pks.length > 0)
         {
             //SQL
+            for(String pk : pks)
+            {
+                DB.appMap.remove(pk);
+            }
             return null;
         }
         throw new ZNSH_DataAccessException();
@@ -114,7 +124,7 @@ public class AppDAO extends SuperDAO
     {
         List<App> list = new ArrayList<>();
         //SQL
-        return list;
+        return DB.appMap.values().stream().collect(Collectors.toList());
     }
 
     /**
@@ -132,6 +142,7 @@ public class AppDAO extends SuperDAO
         if(JText.isNormal(pk))
         {
             //SQL
+            return DB.appMap.get(pk);
         }
         return null;
     }
@@ -151,6 +162,13 @@ public class AppDAO extends SuperDAO
         if(JText.isNormal(key))
         {
             //SQL
+            for(App app : DB.appMap.values())
+            {
+                if(app.getPk().equals(key) || app.getAccount().equals(key) || app.getPhone().equals(key) || app.getEmail().equals(key))
+                {
+                    return app;
+                }
+            }
         }
         return null;
     }

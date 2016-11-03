@@ -1,9 +1,12 @@
 /*
  * Copyright (c) 2016. Embedded Real-Time Computation Lab Of UESTC.
  *
- * 电子科技大学・信息与软件工程学院・嵌入式实时计算研究所
- *
+ * 版权所有：电子科技大学・信息与软件工程学院・嵌入式实时计算研究所（简称ERCL）
  * http://www.is.uestc.edu.cn
+ *
+ * 未经许可，任何其他组织或个人不得将此程序——
+ * 1、用于商业用途。
+ * 2、修改或再发布。
  */
 package uestc.ercl.znsh.platform.component;
 
@@ -15,13 +18,14 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import uestc.ercl.znsh.common.entity.Cluster;
 import uestc.ercl.znsh.common.exception.ZNSH_DataAccessException;
-import uestc.ercl.znsh.common.exception.ZNSH_IllegalFieldValueException;
+import uestc.ercl.znsh.common.exception.ZNSH_IllegalArgumentException;
 import uestc.ercl.znsh.common.exception.ZNSH_ServiceException;
 import uestc.ercl.znsh.platform.component.def.AppManager;
 import uestc.ercl.znsh.platform.component.def.ClusterManager;
 import uestc.ercl.znsh.platform.dao.ClusterDAO;
 import uestc.ercl.znsh.platform.util.ArgValidator;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -39,21 +43,30 @@ public class ClusterManagerImpl implements ClusterManager
 
     @Override
     public void create(@NonNull String name, @Nullable String desc, @Nullable String url)
-            throws ZNSH_IllegalFieldValueException, ZNSH_ServiceException
+            throws ZNSH_IllegalArgumentException, ZNSH_ServiceException
     {
         ArgValidator.checkArgNonnull(name, "集群名称");
+        try
+        {
+            Cluster cluster = new Cluster(name, desc, url, new Date(), new Date());
+            clusterDAO.insert(cluster);
+        } catch(ZNSH_DataAccessException e)
+        {
+            LOGGER.error("创建集群失败！");
+            throw new ZNSH_ServiceException(e);
+        }
     }
 
     @Override
     public Cluster retrieve(int pk)
-            throws ZNSH_IllegalFieldValueException, ZNSH_ServiceException
+            throws ZNSH_IllegalArgumentException, ZNSH_ServiceException
     {
         return null;
     }
 
     @Override
     public List<Cluster> retrieve(@Nullable String pk, @Nullable String name, @Nullable String desc, @Nullable String url, int from, int count)
-            throws ZNSH_IllegalFieldValueException, ZNSH_ServiceException
+            throws ZNSH_IllegalArgumentException, ZNSH_ServiceException
     {
         if(from < 0)
         {
@@ -75,14 +88,14 @@ public class ClusterManagerImpl implements ClusterManager
 
     @Override
     public void update(int pk, @Nullable String name, @Nullable String desc, @Nullable String url)
-            throws ZNSH_IllegalFieldValueException, ZNSH_ServiceException
+            throws ZNSH_IllegalArgumentException, ZNSH_ServiceException
     {
-        Cluster cluster = new Cluster();
-        cluster.setName(name);
-        cluster.setDesc(desc);
-        cluster.setUrl(url);
         try
         {
+            Cluster cluster = new Cluster();
+            cluster.setName(name);
+            cluster.setDesc(desc);
+            cluster.setUrl(url);
             clusterDAO.update(cluster);
         } catch(ZNSH_DataAccessException e)
         {
@@ -93,11 +106,11 @@ public class ClusterManagerImpl implements ClusterManager
 
     @Override
     public Set<String> delete(@NonNull int[] pks)
-            throws ZNSH_IllegalFieldValueException, ZNSH_ServiceException
+            throws ZNSH_IllegalArgumentException, ZNSH_ServiceException
     {
         if(pks == null || pks.length <= 0)
         {
-            throw new ZNSH_IllegalFieldValueException("未选择集群！");
+            throw new ZNSH_IllegalArgumentException("未选择集群！");
         } else
         {
             try

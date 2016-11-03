@@ -1,9 +1,12 @@
 /*
  * Copyright (c) 2016. Embedded Real-Time Computation Lab Of UESTC.
  *
- * 电子科技大学・信息与软件工程学院・嵌入式实时计算研究所
- *
+ * 版权所有：电子科技大学・信息与软件工程学院・嵌入式实时计算研究所（简称ERCL）
  * http://www.is.uestc.edu.cn
+ *
+ * 未经许可，任何其他组织或个人不得将此程序——
+ * 1、用于商业用途。
+ * 2、修改或再发布。
  */
 package uestc.ercl.znsh.platform.restapi.admin;
 
@@ -17,7 +20,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import uestc.ercl.znsh.common.constant.AppStatus;
 import uestc.ercl.znsh.common.constant.AppType;
 import uestc.ercl.znsh.common.entity.App;
-import uestc.ercl.znsh.common.exception.ZNSH_IllegalFieldValueException;
+import uestc.ercl.znsh.common.exception.ZNSH_IllegalArgumentException;
 import uestc.ercl.znsh.common.exception.ZNSH_ServiceException;
 import uestc.ercl.znsh.platform.component.AppManagerImpl;
 import uestc.ercl.znsh.platform.component.def.AppManager;
@@ -70,7 +73,7 @@ public class AppController extends BaseController
                         break;
                 }
                 return "添加应用成功！";
-            } catch(ZNSH_IllegalFieldValueException e)
+            } catch(ZNSH_IllegalArgumentException e)
             {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST, "添加应用失败！原因：" + e.getMessage());
             } catch(ZNSH_ServiceException e)
@@ -87,13 +90,14 @@ public class AppController extends BaseController
     @ResponseBody
     @RequestMapping(method = RequestMethod.GET)
     public List<App> retrieve(HttpServletRequest request, HttpServletResponse response, String pk, String name, AppType type, AppStatus status,
-            String master, String pid, String phone, String email, int from, int count)
+            String master, String pid, String phone, String email, @RequestParam(defaultValue = "0") Integer from,
+            @RequestParam(defaultValue = "20") Integer count)
             throws IOException
     {
         try
         {
             return appManager.find(pk, name, type, status, master, pid, phone, email, from, count);
-        } catch(ZNSH_IllegalFieldValueException e)
+        } catch(ZNSH_IllegalArgumentException e)
         {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "查询应用列表失败！原因：" + e.getMessage());
         } catch(ZNSH_ServiceException e)
@@ -113,7 +117,7 @@ public class AppController extends BaseController
         {
             appManager.update(pk, name, desc, master, pid, phone, email, account);
             return "修改应用信息成功！";
-        } catch(ZNSH_IllegalFieldValueException e)
+        } catch(ZNSH_IllegalArgumentException e)
         {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "修改应用信息失败！原因：" + e.getMessage());
         } catch(ZNSH_ServiceException e)
@@ -135,7 +139,7 @@ public class AppController extends BaseController
             {
                 appManager.delete(appIds);
                 return "删除应用成功！";
-            } catch(ZNSH_IllegalFieldValueException e)
+            } catch(ZNSH_IllegalArgumentException e)
             {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST, "删除应用失败！原因：" + e.getMessage());
             } catch(ZNSH_ServiceException e)
@@ -161,7 +165,7 @@ public class AppController extends BaseController
             {
                 appManager.disable(appIds);
                 return "注销应用成功！";
-            } catch(ZNSH_IllegalFieldValueException e)
+            } catch(ZNSH_IllegalArgumentException e)
             {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST, "注销应用失败！原因：" + e.getMessage());
             } catch(ZNSH_ServiceException e)
@@ -187,7 +191,7 @@ public class AppController extends BaseController
             {
                 appManager.activate(appIds);
                 return "激活应用成功！";
-            } catch(ZNSH_IllegalFieldValueException e)
+            } catch(ZNSH_IllegalArgumentException e)
             {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST, "激活应用失败！原因：" + e.getMessage());
             } catch(ZNSH_ServiceException e)
@@ -213,7 +217,7 @@ public class AppController extends BaseController
             {
                 appManager.suspend(appIds);
                 return "挂起应用成功！";
-            } catch(ZNSH_IllegalFieldValueException e)
+            } catch(ZNSH_IllegalArgumentException e)
             {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST, "挂起应用失败！原因：" + e.getMessage());
             } catch(ZNSH_ServiceException e)
@@ -239,7 +243,7 @@ public class AppController extends BaseController
             {
                 appManager.review(accept, appIds);
                 return "审批应用成功！";
-            } catch(ZNSH_IllegalFieldValueException e)
+            } catch(ZNSH_IllegalArgumentException e)
             {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST, "审批应用失败！原因：" + e.getMessage());
             } catch(ZNSH_ServiceException e)
@@ -265,7 +269,7 @@ public class AppController extends BaseController
             {
                 appManager.setCluster(clusterPk, appIds);
                 return "分配集群成功！";
-            } catch(ZNSH_IllegalFieldValueException e)
+            } catch(ZNSH_IllegalArgumentException e)
             {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST, "分配集群失败！原因：" + e.getMessage());
             } catch(ZNSH_ServiceException e)

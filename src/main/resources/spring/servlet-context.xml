@@ -2,9 +2,12 @@
 <!--
   ~ Copyright (c) 2016. Embedded Real-Time Computation Lab Of UESTC.
   ~
-  ~ 电子科技大学・信息与软件工程学院・嵌入式实时计算研究所
-  ~
+  ~ 版权所有：电子科技大学・信息与软件工程学院・嵌入式实时计算研究所（简称ERCL）
   ~ http://www.is.uestc.edu.cn
+  ~
+  ~ 未经许可，任何其他组织或个人不得将此程序——
+  ~ 1、用于商业用途。
+  ~ 2、修改或再发布。
   -->
 <beans xmlns:context="http://www.springframework.org/schema/context"
        xmlns:mvc="http://www.springframework.org/schema/mvc"
@@ -16,7 +19,7 @@
              http://www.springframework.org/schema/context/spring-context.xsd
              http://www.springframework.org/schema/mvc
              http://www.springframework.org/schema/mvc/spring-mvc.xsd">
-    <context:property-placeholder location="classpath:znsh.conf"/>
+    <context:property-placeholder location="file://${user.home}/.znsh/znsh.conf"/>
     <context:annotation-config/>
     <mvc:annotation-driven>
         <mvc:message-converters register-defaults="true">
@@ -50,10 +53,10 @@
     </bean>
     <!-- 拦截器 -->
     <mvc:interceptors>
-        <!-- 系统管理接口身份认证 -->
+        <!-- 访问日志 -->
         <mvc:interceptor>
-            <mvc:mapping path="/api/admin/**"/>
-            <bean class="uestc.ercl.znsh.platform.interceptor.AdminOfSysAuthenticator"/>
+            <mvc:mapping path="/**"/>
+            <bean class="uestc.ercl.znsh.platform.interceptor.AccessLogger"/>
         </mvc:interceptor>
         <!-- 应用管理接口身份认证 -->
         <mvc:interceptor>
@@ -65,20 +68,25 @@
             <mvc:exclude-mapping path="/api/verify"/>
             <bean class="uestc.ercl.znsh.platform.interceptor.AdminOfAppAuthenticator"/>
         </mvc:interceptor>
+        <!-- 系统管理接口身份认证 -->
+        <mvc:interceptor>
+            <mvc:mapping path="/api/admin/**"/>
+            <bean class="uestc.ercl.znsh.platform.interceptor.AdminOfSysAuthenticator"/>
+        </mvc:interceptor>
         <!-- 集群服务接口身份认证 -->
         <mvc:interceptor>
             <mvc:mapping path="/api/service/**"/>
-            <bean class="uestc.ercl.znsh.platform.interceptor.ClusterAuthenticator"/>
+            <bean class="uestc.ercl.znsh.platform.interceptor.ClusterMasterAuthenticator"/>
         </mvc:interceptor>
     </mvc:interceptors>
     <!-- 数据源 -->
     <bean name="oracleDataSource" class="oracle.jdbc.pool.OracleDataSource">
-        <property name="driverType" value="${oracle.driverType}"/>
-        <property name="serverName" value="${oracle.serverName}"/>
-        <property name="portNumber" value="${oracle.portNumber}"/>
-        <property name="databaseName" value="${oracle.databaseName}"/>
-        <property name="user" value="${oracle.user}"/>
-        <property name="password" value="${oracle.password}"/>
+        <property name="driverType" value="${ORACLE_DRIVERTYPE}"/>
+        <property name="serverName" value="${ORACLE_SERVERNAME}"/>
+        <property name="portNumber" value="${ORACLE_PORTNUMBER}"/>
+        <property name="databaseName" value="${ORACLE_DATABASENAME}"/>
+        <property name="user" value="${ORACLE_USER}"/>
+        <property name="password" value="${ORACLE_PASSWORD}"/>
     </bean>
     <bean name="dataSource" class="com.zaxxer.hikari.HikariDataSource" destroy-method="close">
         <property name="dataSource" ref="oracleDataSource"/>
