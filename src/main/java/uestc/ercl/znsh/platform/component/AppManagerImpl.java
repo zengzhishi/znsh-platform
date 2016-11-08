@@ -32,6 +32,7 @@ import uestc.ercl.znsh.common.entity.Config;
 import uestc.ercl.znsh.common.exception.ZNSH_DataAccessException;
 import uestc.ercl.znsh.common.exception.ZNSH_IllegalArgumentException;
 import uestc.ercl.znsh.common.exception.ZNSH_ServiceException;
+import uestc.ercl.znsh.common.logging.LogSource;
 import uestc.ercl.znsh.common.logging.LogType;
 import uestc.ercl.znsh.platform.component.def.AppManager;
 import uestc.ercl.znsh.platform.component.def.SysConfigManager;
@@ -99,6 +100,7 @@ public class AppManagerImpl extends _SysLoggerHolder implements AppManager
         this.configDAO = configDAO;
         this.appDAO = appDAO;
         this.sysConfigManager = sysConfigManager;
+        sysLogger = new SysLogManagerImpl(LogSource.SYS, appDAO.getJdbcTemplate().getDataSource());
     }
 
     @Override

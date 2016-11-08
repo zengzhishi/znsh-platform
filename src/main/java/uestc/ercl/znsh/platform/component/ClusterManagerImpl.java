@@ -20,6 +20,7 @@ import uestc.ercl.znsh.common.entity.Cluster;
 import uestc.ercl.znsh.common.exception.ZNSH_DataAccessException;
 import uestc.ercl.znsh.common.exception.ZNSH_IllegalArgumentException;
 import uestc.ercl.znsh.common.exception.ZNSH_ServiceException;
+import uestc.ercl.znsh.common.logging.LogSource;
 import uestc.ercl.znsh.platform.component.def.AppManager;
 import uestc.ercl.znsh.platform.component.def.ClusterManager;
 import uestc.ercl.znsh.platform.dao.ClusterDAO;
@@ -38,6 +39,7 @@ public class ClusterManagerImpl extends _SysLoggerHolder implements ClusterManag
     {
         Assert.notNull(clusterDAO, "ClusterDAO 注入失败！不能为空！");
         this.clusterDAO = clusterDAO;
+        sysLogger = new SysLogManagerImpl(LogSource.SYS, clusterDAO.getJdbcTemplate().getDataSource());
     }
 
     @Override

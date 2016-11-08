@@ -10,23 +10,24 @@
  */
 package uestc.ercl.znsh.platform.restapi.admin;
 
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import uestc.ercl.znsh.common.exception.ZNSH_DataAccessException;
 import uestc.ercl.znsh.common.logging.LogLevel;
 import uestc.ercl.znsh.common.logging.LogSource;
 import uestc.ercl.znsh.common.logging.LogType;
 import uestc.ercl.znsh.common.logging.SysLogManager;
 import uestc.ercl.znsh.platform.component.SysLogManagerImpl;
+import uestc.ercl.znsh.platform.dao.SysConfigDAO;
 import uestc.ercl.znsh.platform.restapi.BaseController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
@@ -39,13 +40,15 @@ import java.util.Map;
 @RequestMapping(path = "api/admin/log")
 public class LogController extends BaseController
 {
-    private final SysLogManager sysLogManager;
+    private SysLogManager sysLogManager;
+    private final SysConfigDAO sysConfigDAO;
 
-    public LogController()
+    @Autowired
+    public LogController(SysConfigDAO sysConfigDAO)
     {
-        ApplicationContext ctx = new ClassPathXmlApplicationContext("spring/servlet-context.xml");
-        DataSource dataSource = (DataSource)ctx.getBean("dataSource");
-        sysLogManager = new SysLogManagerImpl(LogSource.SYS, dataSource);
+        Assert.notNull(sysConfigDAO);
+        this.sysConfigDAO = sysConfigDAO;
+        sysLogManager = new SysLogManagerImpl(LogSource.SYS, sysConfigDAO.getJdbcTemplate().getDataSource());
     }
 
     @ResponseBody
@@ -55,12 +58,19 @@ public class LogController extends BaseController
             @RequestParam(defaultValue = "20") Integer count)
             throws IOException
     {
-        LogSource logSource = LogSource.valueOf(source);
-        LogType logType = LogType.valueOf(type);
-        LogLevel logLevel = LogLevel.valueOf(level);
+        LogSource logSource = LogSource.parse(source);
+        LogType logType = LogType.parse(type);
+        LogLevel logLevel = LogLevel.parse(level);
         Date start = timeStart != null ? new Date(timeStart) : null;
         Date end = timeEnd != null ? new Date(timeEnd) : null;
-        return sysLogManager.find(title, content, logSource, logType, logLevel, start, end, from, count);
+        try
+        {
+            return sysLogManager.find(title, content, logSource, logType, logLevel, start, end, from, count);
+        } catch(ZNSH_DataAccessException e)
+        {
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "查询日志列表失败！");
+        }
+        return null;
     }
 
     @ResponseBody
@@ -68,6 +78,6 @@ public class LogController extends BaseController
     public String delete(HttpServletRequest request, HttpServletResponse response)
             throws IOException
     {
-        return "未实现";
+        return "暂未实现";
     }
 }

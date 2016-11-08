@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
+import uestc.ercl.znsh.common.logging.LogSource;
 import uestc.ercl.znsh.platform.component.def.VerifyManager;
 import uestc.ercl.znsh.platform.constant.VerifyCodeStatus;
 import uestc.ercl.znsh.platform.dao.VerifyCodeDAO;
@@ -35,6 +36,7 @@ public class VerifyManagerImpl extends _SysLoggerHolder implements VerifyManager
         Assert.notNull(sysConfigService);
         this.verifyCodeDAO = verifyCodeDAO;
         this.sysConfigService = sysConfigService;
+        sysLogger = new SysLogManagerImpl(LogSource.SYS, verifyCodeDAO.getJdbcTemplate().getDataSource());
     }
 
     @Override

@@ -10,21 +10,9 @@
  */
 package uestc.ercl.znsh.platform.component;
 
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-import uestc.ercl.znsh.common.logging.LogSource;
 import uestc.ercl.znsh.common.logging.SysLogManager;
-
-import javax.sql.DataSource;
 
 public abstract class _SysLoggerHolder
 {
     protected SysLogManager sysLogger;
-
-    public _SysLoggerHolder()
-    {
-        ApplicationContext ctx = new ClassPathXmlApplicationContext("spring/servlet-context.xml");
-        DataSource dataSource = (DataSource)ctx.getBean("dataSource");
-        sysLogger = new SysLogManagerImpl(LogSource.SYS, dataSource);
-    }
 }

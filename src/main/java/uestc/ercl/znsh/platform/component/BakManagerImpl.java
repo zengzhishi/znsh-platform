@@ -24,6 +24,10 @@ import java.util.Map;
 @Component
 public class BakManagerImpl extends _SysLoggerHolder implements BakManager
 {
+    public BakManagerImpl()
+    {
+    }
+
     @Override
     public Map<String, List<Sheet>> getAllAppSheets()
     {

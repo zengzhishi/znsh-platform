@@ -14,17 +14,20 @@ import cn.sel.jutil.annotation.note.NonNull;
 import cn.sel.jutil.annotation.note.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import uestc.ercl.znsh.common.entity.Sheet;
 import uestc.ercl.znsh.common.exception.ZNSH_DataAccessException;
 import uestc.ercl.znsh.common.exception.ZNSH_IllegalArgumentException;
 import uestc.ercl.znsh.common.exception.ZNSH_ServiceException;
+import uestc.ercl.znsh.common.logging.LogSource;
 import uestc.ercl.znsh.platform.component.def.SheetManager;
 import uestc.ercl.znsh.platform.dao.SheetDAO;
 
 import java.util.List;
 import java.util.Set;
 
+@Component
 public class SheetManagerImpl extends _SysLoggerHolder implements SheetManager
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(SheetManagerImpl.class);
@@ -34,6 +37,7 @@ public class SheetManagerImpl extends _SysLoggerHolder implements SheetManager
     {
         Assert.notNull(sheetDAO, "SheetDAO 注入失败！不能为空！");
         this.sheetDAO = sheetDAO;
+        sysLogger = new SysLogManagerImpl(LogSource.SYS, sheetDAO.getJdbcTemplate().getDataSource());
     }
 
     @Override

@@ -20,6 +20,7 @@ import uestc.ercl.znsh.common.exception.ZNSH_DataAccessException;
 import uestc.ercl.znsh.common.exception.ZNSH_IllegalArgumentException;
 import uestc.ercl.znsh.common.exception.ZNSH_IllegalDataException;
 import uestc.ercl.znsh.common.exception.ZNSH_InternalException;
+import uestc.ercl.znsh.common.logging.LogSource;
 import uestc.ercl.znsh.platform.component.def.RuleManager;
 import uestc.ercl.znsh.platform.dao.RuleDAO;
 
@@ -34,6 +35,7 @@ public class RuleManagerImpl extends _SysLoggerHolder implements RuleManager
     {
         Objects.requireNonNull(ruleDAO, "RuleDAO 注入失败！不能为空！");
         this.ruleDAO = ruleDAO;
+        sysLogger = new SysLogManagerImpl(LogSource.SYS, ruleDAO.getJdbcTemplate().getDataSource());
     }
 
     /**
@@ -65,6 +67,7 @@ public class RuleManagerImpl extends _SysLoggerHolder implements RuleManager
         }
         return flag == 0 ? createRule(jsonNode, appId, creator) : updateRule(jsonNode);
     }
+
 
     private Rule createRule(JsonNode jsonNode, String appId, int creator)
             throws ZNSH_IllegalArgumentException, ZNSH_InternalException

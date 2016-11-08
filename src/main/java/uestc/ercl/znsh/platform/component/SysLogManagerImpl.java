@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import uestc.ercl.znsh.common.data.DataUtil;
+import uestc.ercl.znsh.common.exception.ZNSH_DataAccessException;
 import uestc.ercl.znsh.common.logging.LogLevel;
 import uestc.ercl.znsh.common.logging.LogSource;
 import uestc.ercl.znsh.common.logging.LogType;
@@ -92,6 +93,7 @@ public class SysLogManagerImpl extends SysLogManager
     @Nullable
     public List<Map<String, Object>> find(@Nullable String title, @Nullable String content, @Nullable LogSource source, @Nullable LogType type,
             @Nullable LogLevel level, @Nullable Date timeStart, @Nullable Date timeEnd, long from, int count)
+            throws ZNSH_DataAccessException
     {
         String sql = "SELECT * FROM common.\"" + TABLE_NAME + "\" WHERE 1=1";
         if(JText.isNormal(title))
@@ -129,13 +131,14 @@ public class SysLogManagerImpl extends SysLogManager
         } catch(Exception e)
         {
             LOGGER.error("查询系统日志出错，详见以上堆栈跟踪。", e);
+            throw new ZNSH_DataAccessException("查询系统日志失败！");
         }
-        return null;
     }
 
     @Override
-    public boolean delete(@Nullable String title, @Nullable String content, @Nullable LogSource source, @Nullable LogType type,
-            @Nullable LogLevel level, @Nullable Date timeStart, @Nullable Date timeEnd)
+    public void delete(@Nullable String title, @Nullable String content, @Nullable LogSource source, @Nullable LogType type, @Nullable LogLevel level,
+            @Nullable Date timeStart, @Nullable Date timeEnd)
+            throws ZNSH_DataAccessException
     {
         String sql = "DELETE FROM common.\"" + TABLE_NAME + "\" WHERE 1=1";
         if(JText.isNormal(title))
@@ -168,16 +171,17 @@ public class SysLogManagerImpl extends SysLogManager
         }
         try
         {
-            return jdbcDAO.getJdbcTemplate().update(sql) > 0;
+            jdbcDAO.getJdbcTemplate().update(sql);
         } catch(Exception e)
         {
             LOGGER.error("删除系统日志出错，详见以上堆栈跟踪。", e);
+            throw new ZNSH_DataAccessException("删除系统日志失败！");
         }
-        return false;
     }
 
     @Override
-    public boolean delete(@NonNull CharSequence... pks)
+    public void delete(@NonNull CharSequence... pks)
+            throws ZNSH_DataAccessException
     {
         if(pks == null || pks.length < 1)
         {
@@ -187,32 +191,36 @@ public class SysLogManagerImpl extends SysLogManager
             String sql = "DELETE FROM common.\"" + TABLE_NAME + "\" WHERE pk IN (?)";
             try
             {
-                return jdbcDAO.getJdbcTemplate().update(sql, DataUtil.joinPKs(pks)) == pks.length;
+                int deletedRows = jdbcDAO.getJdbcTemplate().update(sql, DataUtil.joinPKs(pks));
+                if(deletedRows != pks.length)
+                {
+                    throw new ZNSH_DataAccessException("部分日志删除失败！");
+                }
             } catch(Exception e)
             {
                 LOGGER.error("删除系统日志出错，详见以上堆栈跟踪。", e);
+                throw new ZNSH_DataAccessException("删除系统日志失败！");
             }
         }
-        return false;
     }
 
     @Override
-    public boolean clear()
+    public void clear()
+            throws ZNSH_DataAccessException
     {
         String sql = "DELETE FROM common.\"" + TABLE_NAME + "\" WHERE 1=1";
         try
         {
             jdbcDAO.getJdbcTemplate().update(sql);
-            return true;
         } catch(Exception e)
         {
             LOGGER.error("清空系统日志出错，详见以上堆栈跟踪。", e);
+            throw new ZNSH_DataAccessException("清空系统日志失败！");
         }
-        return false;
     }
 
     @Override
-    protected boolean log(@NonNull String title, @NonNull String content, @Nullable LogSource source, @NonNull LogType type, @NonNull LogLevel level)
+    protected void log(@NonNull String title, @NonNull String content, @Nullable LogSource source, @NonNull LogType type, @NonNull LogLevel level)
     {
         String pk = DataUtil.newPK32();
         System.out.println(String.format("新日志：主键=%s，标题=%s，内容=%s，类型=%s，级别=%s", pk, title, content, type, level));
@@ -222,13 +230,15 @@ public class SysLogManagerImpl extends SysLogManager
             try
             {
                 int affectedRowCount = jdbcDAO.getJdbcTemplate().update(sql, pk, title, content, source.value(), type.value(), level.value());
-                return affectedRowCount == 1;
+                if(affectedRowCount != 1)
+                {
+                    throw new ZNSH_DataAccessException();
+                }
             } catch(Exception e)
             {
-                LOGGER.error("保存系统日志出错，详见以上堆栈跟踪。", e);
+                LOGGER.error(String.format("保存系统日志失败！详见以上堆栈跟踪。日志信息：标题=%s|内容=%s|类型=%s。", title, content, LogType.SYS_RUNTIME), e);
             }
         }
-        return false;
     }
 
     private boolean checkLog(String title, String content, LogType type, LogLevel level)

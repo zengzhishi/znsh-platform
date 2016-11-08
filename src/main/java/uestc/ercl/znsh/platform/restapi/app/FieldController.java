@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import uestc.ercl.znsh.common.entity.Field;
 import uestc.ercl.znsh.common.exception.ZNSH_IllegalArgumentException;
 import uestc.ercl.znsh.common.exception.ZNSH_ServiceException;
+import uestc.ercl.znsh.platform.component.FieldManagerImpl;
 import uestc.ercl.znsh.platform.component.def.FieldManager;
 import uestc.ercl.znsh.platform.restapi.BaseController;
 
@@ -35,7 +36,7 @@ public class FieldController extends BaseController
     private FieldManager fieldManager;
 
     @Autowired
-    public FieldController(FieldManager fieldManager)
+    public FieldController(FieldManagerImpl fieldManager)
     {
         Assert.notNull(fieldManager, "FieldManager 注入失败！不能为空！");
         this.fieldManager = fieldManager;

@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import uestc.ercl.znsh.common.entity.Config;
 import uestc.ercl.znsh.common.exception.ZNSH_IllegalArgumentException;
+import uestc.ercl.znsh.common.logging.LogSource;
 import uestc.ercl.znsh.platform.component.def.SysConfigManager;
 import uestc.ercl.znsh.platform.constant.SysConfigName;
 import uestc.ercl.znsh.platform.dao.SysConfigDAO;
@@ -37,6 +38,7 @@ public class SysConfigManagerImpl extends _SysLoggerHolder implements SysConfigM
     {
         Assert.notNull(sysConfigDAO, "SysConfigDAO 注入失败！不能为空！");
         this.sysConfigDAO = sysConfigDAO;
+        sysLogger = new SysLogManagerImpl(LogSource.SYS, sysConfigDAO.getJdbcTemplate().getDataSource());
     }
 
     @Override

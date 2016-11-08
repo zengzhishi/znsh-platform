@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import uestc.ercl.znsh.common.entity.Sheet;
 import uestc.ercl.znsh.common.exception.ZNSH_IllegalArgumentException;
 import uestc.ercl.znsh.common.exception.ZNSH_ServiceException;
+import uestc.ercl.znsh.platform.component.SheetManagerImpl;
 import uestc.ercl.znsh.platform.component.def.SheetManager;
 import uestc.ercl.znsh.platform.restapi.BaseController;
 
@@ -35,7 +36,7 @@ public class SheetController extends BaseController
     private SheetManager sheetManager;
 
     @Autowired
-    public SheetController(SheetManager sheetManager)
+    public SheetController(SheetManagerImpl sheetManager)
     {
         Assert.notNull(sheetManager, "SheetManager 注入失败！不能为空！");
         this.sheetManager = sheetManager;
