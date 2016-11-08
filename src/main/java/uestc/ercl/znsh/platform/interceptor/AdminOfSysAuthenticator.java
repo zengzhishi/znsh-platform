@@ -41,21 +41,6 @@ public class AdminOfSysAuthenticator implements HandlerInterceptor
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView)
             throws Exception
     {
-        String requestMethod = request.getMethod();
-        response.setHeader("Access-Control-Allow-Origin", "*");
-        response.setHeader("Access-Control-Allow-Methods", requestMethod);
-        response.setHeader("Access-Control-Allow-Headers", "x-requested-with,content-type");
-        switch(requestMethod)
-        {
-            case "GET":
-                break;
-            case "POST":
-                break;
-            case "PUT":
-                break;
-            case "DELETE":
-                break;
-        }
     }
 
     @Override

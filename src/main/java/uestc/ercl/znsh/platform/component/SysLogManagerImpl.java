@@ -35,9 +35,9 @@ import java.util.Map;
  * 面向Oracle数据库的日志实现
  * TODO SQL待改，当前是PG的
  */
-public class LogManagerImpl extends SysLogManager
+public class SysLogManagerImpl extends SysLogManager
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger(LogManagerImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SysLogManagerImpl.class);
     private static final RowMapper<Map<String, Object>> LOG_MAPPER = (rs, rowNum)->
     {
         Map<String, Object> result = new HashMap<>();
@@ -71,7 +71,7 @@ public class LogManagerImpl extends SysLogManager
     {
     };
 
-    public LogManagerImpl(@NonNull LogSource logSource, @NonNull DataSource dataSource)
+    public SysLogManagerImpl(@NonNull LogSource logSource, @NonNull DataSource dataSource)
     {
         super(logSource);
         if(dataSource == null)

@@ -23,13 +23,12 @@ import uestc.ercl.znsh.common.security.Token;
 import uestc.ercl.znsh.common.security.TokenRole;
 import uestc.ercl.znsh.platform.component.AppManagerImpl;
 import uestc.ercl.znsh.platform.component.def.AppManager;
-import uestc.ercl.znsh.platform.constants.AppConfigName;
+import uestc.ercl.znsh.platform.constant.AppConfigName;
 import uestc.ercl.znsh.platform.restapi.BaseController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Date;
 
 /**
  * 应用管理接口
@@ -43,7 +42,7 @@ public class AccountController extends BaseController
     @Autowired
     public AccountController(AppManagerImpl appManager)
     {
-        Assert.notNull(appManager, "AppService注入失败！不能为空！");
+        Assert.notNull(appManager, "AppService 注入失败！不能为空！");
         this.appManager = appManager;
     }
 
@@ -203,7 +202,7 @@ public class AccountController extends BaseController
             Token token = new Token(appId, TokenRole.TERMINAL, key);
             try
             {
-                Config config = new Config(AppConfigName.TOKEN, token.token(), new Date());
+                Config config = new Config(AppConfigName.TOKEN, token.token());
                 boolean success = appManager.setConfig(appId, config);
                 if(success)
                 {

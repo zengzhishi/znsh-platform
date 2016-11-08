@@ -27,7 +27,7 @@ import uestc.ercl.znsh.platform.component.AppManagerImpl;
 import uestc.ercl.znsh.platform.component.VerifyManagerImpl;
 import uestc.ercl.znsh.platform.component.def.AppManager;
 import uestc.ercl.znsh.platform.component.def.VerifyManager;
-import uestc.ercl.znsh.platform.constants.AppConfigName;
+import uestc.ercl.znsh.platform.constant.AppConfigName;
 import uestc.ercl.znsh.platform.restapi.BaseController;
 
 import javax.servlet.http.HttpServletRequest;
@@ -47,8 +47,8 @@ public class OpenController extends BaseController
     @Autowired
     public OpenController(AppManagerImpl appManager, VerifyManagerImpl verifyManager)
     {
-        Assert.notNull(appManager, "AppService注入失败！不能为空！");
-        Assert.notNull(verifyManager, "VerifierService注入失败！不能为空！");
+        Assert.notNull(appManager, "AppService 注入失败！不能为空！");
+        Assert.notNull(verifyManager, "VerifierService 注入失败！不能为空！");
         this.appManager = appManager;
         this.verifyManager = verifyManager;
     }

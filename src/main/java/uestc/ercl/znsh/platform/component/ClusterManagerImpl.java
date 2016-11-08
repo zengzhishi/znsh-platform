@@ -25,19 +25,18 @@ import uestc.ercl.znsh.platform.component.def.ClusterManager;
 import uestc.ercl.znsh.platform.dao.ClusterDAO;
 import uestc.ercl.znsh.platform.util.ArgValidator;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
 @Component
-public class ClusterManagerImpl implements ClusterManager
+public class ClusterManagerImpl extends _SysLoggerHolder implements ClusterManager
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(AppManager.class);
     private final ClusterDAO clusterDAO;
 
     public ClusterManagerImpl(ClusterDAO clusterDAO)
     {
-        Assert.notNull(clusterDAO, "ClusterDAO注入失败！不能为空！");
+        Assert.notNull(clusterDAO, "ClusterDAO 注入失败！不能为空！");
         this.clusterDAO = clusterDAO;
     }
 
@@ -48,7 +47,7 @@ public class ClusterManagerImpl implements ClusterManager
         ArgValidator.checkArgNonnull(name, "集群名称");
         try
         {
-            Cluster cluster = new Cluster(name, desc, url, new Date(), new Date());
+            Cluster cluster = new Cluster(name, desc, url);
             clusterDAO.insert(cluster);
         } catch(ZNSH_DataAccessException e)
         {
@@ -61,11 +60,31 @@ public class ClusterManagerImpl implements ClusterManager
     public Cluster retrieve(int pk)
             throws ZNSH_IllegalArgumentException, ZNSH_ServiceException
     {
-        return null;
+        try
+        {
+            List<Cluster> list = clusterDAO.select(String.valueOf(pk), null, null, null, 0, 0);
+            if(list != null)
+            {
+                if(list.size() == 1)
+                {
+                    return list.get(0);
+                } else
+                {
+                    throw new ZNSH_ServiceException("查询集群列表失败！持久化数据异常！");
+                }
+            } else
+            {
+                throw new ZNSH_ServiceException("查询集群列表失败！指定集群不存在！");
+            }
+        } catch(ZNSH_DataAccessException e)
+        {
+            LOGGER.error("查询集群列表失败！数据访问未完成！");
+            throw new ZNSH_ServiceException(e);
+        }
     }
 
     @Override
-    public List<Cluster> retrieve(@Nullable String pk, @Nullable String name, @Nullable String desc, @Nullable String url, int from, int count)
+    public List<Cluster> retrieve(@Nullable String pk, @Nullable String name, @Nullable String desc, @Nullable String url, long from, int count)
             throws ZNSH_IllegalArgumentException, ZNSH_ServiceException
     {
         if(from < 0)
@@ -93,9 +112,7 @@ public class ClusterManagerImpl implements ClusterManager
         try
         {
             Cluster cluster = new Cluster();
-            cluster.setName(name);
-            cluster.setDesc(desc);
-            cluster.setUrl(url);
+            cluster.update(pk, name, desc, url);
             clusterDAO.update(cluster);
         } catch(ZNSH_DataAccessException e)
         {
@@ -105,7 +122,7 @@ public class ClusterManagerImpl implements ClusterManager
     }
 
     @Override
-    public Set<String> delete(@NonNull int[] pks)
+    public Set<String> delete(@NonNull int... pks)
             throws ZNSH_IllegalArgumentException, ZNSH_ServiceException
     {
         if(pks == null || pks.length <= 0)

@@ -8,14 +8,18 @@
  * 1、用于商业用途。
  * 2、修改或再发布。
  */
-package uestc.ercl.znsh.platform.constants;
+package uestc.ercl.znsh.platform.constant;
 
 /**
- * Created by sel on 16-10-25.
+ * 动态验证结果
+ *
+ * @apiNote 分别为：正确，错误，过期，不存在，系统错
  */
-public class AppConfigName
+public enum VerifyCodeStatus
 {
-    public static final String TOKEN = "TOKEN";
-    public static final String PAGE_SIZE = "PAGE_SIZE";
-    public static final String TASK_LIMIT = "TASK_LIMIT";
+    VALID,
+    INVALID,
+    EXPIRED,
+    NONE,
+    ERROR
 }

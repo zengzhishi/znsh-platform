@@ -12,27 +12,24 @@ package uestc.ercl.znsh.platform.component.def;
 
 import cn.sel.jutil.annotation.note.NonNull;
 import cn.sel.jutil.annotation.note.Nullable;
-import uestc.ercl.znsh.common.entity.Cluster;
+import uestc.ercl.znsh.common.entity.Sheet;
 import uestc.ercl.znsh.common.exception.ZNSH_IllegalArgumentException;
 import uestc.ercl.znsh.common.exception.ZNSH_ServiceException;
 
 import java.util.List;
 import java.util.Set;
 
-public interface ClusterManager
+public interface SheetManager
 {
-    void create(@NonNull String name, @Nullable String desc, @Nullable String url)
+    void create(@NonNull String appId, @NonNull String id, @NonNull String name, @Nullable String desc)
             throws ZNSH_IllegalArgumentException, ZNSH_ServiceException;
 
-    Cluster retrieve(int pk)
+    List<Sheet> retrieve(@Nullable String id, @Nullable String name, @Nullable String desc, long from, int count)
             throws ZNSH_IllegalArgumentException, ZNSH_ServiceException;
 
-    List<Cluster> retrieve(@Nullable String pk, @Nullable String name, @Nullable String desc, @Nullable String url, long from, int count)
+    void update(long pk, @Nullable String name, @Nullable String desc)
             throws ZNSH_IllegalArgumentException, ZNSH_ServiceException;
 
-    void update(int pk, @Nullable String name, @Nullable String desc, @Nullable String url)
-            throws ZNSH_IllegalArgumentException, ZNSH_ServiceException;
-
-    Set<String> delete(@NonNull int... pks)
+    Set<String> delete(long... pks)
             throws ZNSH_IllegalArgumentException, ZNSH_ServiceException;
 }

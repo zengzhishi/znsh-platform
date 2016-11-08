@@ -19,7 +19,11 @@ import uestc.ercl.znsh.common.data.JsonUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 日志记录拦截器
@@ -34,6 +38,13 @@ public class AccessLogger implements HandlerInterceptor
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws Exception
     {
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        response.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE, OPTIONS");
+        if(request.getMethod().equals("OPTIONS"))
+        {
+            response.setStatus(HttpServletResponse.SC_OK);
+            return false;
+        }
         i(request);
         return true;
     }
@@ -49,6 +60,18 @@ public class AccessLogger implements HandlerInterceptor
             throws Exception
     {
         o(request, response);
+    }
+
+    private void i(HttpServletRequest request)
+    {
+        LOGGER.info("{} -> {}\t[{}]\tToken:{}\tHeaders:{}\tParameters:{}", getRealIPAddress(request), request.getRequestURI(), request.getMethod(),
+                request.getHeader("Token"), getHeaders(request), JsonUtil.getJson(request.getParameterMap()));
+    }
+
+    private void o(HttpServletRequest request, HttpServletResponse response)
+    {
+        LOGGER.info("{} -> {}\t[{}]\tStatus:{}\tHeaders:{}", getRealIPAddress(request), request.getRequestURI(), request.getMethod(),
+                response.getStatus(), getHeaders(response));
     }
 
     private String getRealIPAddress(HttpServletRequest request)
@@ -71,14 +94,13 @@ public class AccessLogger implements HandlerInterceptor
 
     private String getHeaders(HttpServletResponse response)
     {
-        Iterator<String> headerNames = response.getHeaderNames().iterator();
-        List<String> result = new ArrayList<>();
-        while(headerNames.hasNext())
+        List<String> headers = response.getHeaderNames().stream().collect(Collectors.toList());
+        for(int i = 0; i < headers.size(); i++)
         {
-            String name = headerNames.next();
-            result.add(String.format("%s=%s", name, response.getHeader(name)));
+            String header = headers.get(i);
+            headers.set(i, String.format("%s=%s", header, response.getHeader(header)));
         }
-        return Arrays.toString(result.toArray());
+        return Arrays.toString(headers.toArray(new String[headers.size()]));
     }
 
     private String getEnumerationString(Enumeration enumeration)
@@ -89,17 +111,5 @@ public class AccessLogger implements HandlerInterceptor
             result.add(String.valueOf(enumeration.nextElement()));
         }
         return Arrays.toString(result.toArray());
-    }
-
-    private void i(HttpServletRequest request)
-    {
-        LOGGER.info("{} -> {}\t[{}]\tToken:{}\tHeaders:{}\tParameters:{}", getRealIPAddress(request), request.getRequestURI(), request.getMethod(),
-                request.getHeader("Token"), getHeaders(request), JsonUtil.getJson(request.getParameterMap()));
-    }
-
-    private void o(HttpServletRequest request, HttpServletResponse response)
-    {
-        LOGGER.info("{} -> {}\t[{}]\tStatus:{}\tHeaders:{}", getRealIPAddress(request), request.getRequestURI(), request.getMethod(),
-                response.getStatus(), getHeaders(response));
     }
 }

@@ -43,12 +43,12 @@ public class AppController extends BaseController
     @Autowired
     public AppController(AppManagerImpl appManager)
     {
-        Assert.notNull(appManager, "AppService注入失败！不能为空！");
+        Assert.notNull(appManager, "AppService 注入失败！不能为空！");
         this.appManager = appManager;
     }
 
     @ResponseBody
-    @RequestMapping(method = RequestMethod.POST)
+    @RequestMapping(method = RequestMethod.POST, produces = "text/plain;charset=UTF-8")
     public String create(HttpServletRequest request, HttpServletResponse response, @RequestParam String name, String desc, @RequestParam int type,
             @RequestParam String master, @RequestParam String pid, @RequestParam String phone, String email, @RequestParam String account,
             @RequestParam String password)
@@ -90,7 +90,7 @@ public class AppController extends BaseController
     @ResponseBody
     @RequestMapping(method = RequestMethod.GET)
     public List<App> retrieve(HttpServletRequest request, HttpServletResponse response, String pk, String name, AppType type, AppStatus status,
-            String master, String pid, String phone, String email, @RequestParam(defaultValue = "0") Integer from,
+            String master, String pid, String phone, String email, @RequestParam(defaultValue = "0") Long from,
             @RequestParam(defaultValue = "20") Integer count)
             throws IOException
     {
@@ -108,7 +108,7 @@ public class AppController extends BaseController
     }
 
     @ResponseBody
-    @RequestMapping(method = RequestMethod.PUT)
+    @RequestMapping(method = RequestMethod.PUT, produces = "text/plain;charset=UTF-8")
     public String update(HttpServletRequest request, HttpServletResponse response, @RequestParam String pk, String name, String desc, String master,
             String pid, String phone, String email, String account)
             throws IOException
@@ -128,7 +128,7 @@ public class AppController extends BaseController
     }
 
     @ResponseBody
-    @RequestMapping(method = RequestMethod.DELETE)
+    @RequestMapping(method = RequestMethod.DELETE, produces = "text/plain;charset=UTF-8")
     public String delete(HttpServletRequest request, HttpServletResponse response, @RequestParam String pks)
             throws IOException
     {
@@ -154,7 +154,7 @@ public class AppController extends BaseController
     }
 
     @ResponseBody
-    @RequestMapping(path = "disable", method = RequestMethod.POST)
+    @RequestMapping(path = "disable", method = RequestMethod.POST, produces = "text/plain;charset=UTF-8")
     public String disable(HttpServletRequest request, HttpServletResponse response, @RequestParam String pks)
             throws IOException
     {
@@ -180,7 +180,7 @@ public class AppController extends BaseController
     }
 
     @ResponseBody
-    @RequestMapping(path = "activate", method = RequestMethod.POST)
+    @RequestMapping(path = "activate", method = RequestMethod.POST, produces = "text/plain;charset=UTF-8")
     public String activate(HttpServletRequest request, HttpServletResponse response, @RequestParam String pks)
             throws IOException
     {
@@ -206,7 +206,7 @@ public class AppController extends BaseController
     }
 
     @ResponseBody
-    @RequestMapping(path = "suspend", method = RequestMethod.POST)
+    @RequestMapping(path = "suspend", method = RequestMethod.POST, produces = "text/plain;charset=UTF-8")
     public String suspend(HttpServletRequest request, HttpServletResponse response, @RequestParam String pks)
             throws IOException
     {
@@ -232,7 +232,7 @@ public class AppController extends BaseController
     }
 
     @ResponseBody
-    @RequestMapping(path = "review", method = RequestMethod.POST)
+    @RequestMapping(path = "review", method = RequestMethod.POST, produces = "text/plain;charset=UTF-8")
     public String review(HttpServletRequest request, HttpServletResponse response, @RequestParam String pks, @RequestParam Boolean accept)
             throws IOException
     {
@@ -258,7 +258,7 @@ public class AppController extends BaseController
     }
 
     @ResponseBody
-    @RequestMapping(path = "cluster", method = RequestMethod.POST)
+    @RequestMapping(path = "cluster", method = RequestMethod.POST, produces = "text/plain;charset=UTF-8")
     public String cluster(HttpServletRequest request, HttpServletResponse response, @RequestParam String pks, @RequestParam Integer clusterPk)
             throws IOException
     {

@@ -10,8 +10,7 @@
  */
 package uestc.ercl.znsh.platform.dao;
 
-import uestc.ercl.znsh.common.entity.App;
-import uestc.ercl.znsh.common.entity.Cluster;
+import uestc.ercl.znsh.common.entity.*;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -25,4 +24,7 @@ class DB
 {
     static Map<Integer, Cluster> clusterMap = new LinkedHashMap<>();
     static Map<String, App> appMap = new LinkedHashMap<>();
+    static Map<Long, Sheet> sheetMap = new LinkedHashMap<>();
+    static Map<Long, Field> fieldMap = new LinkedHashMap<>();
+    static Map<Long, Rule> ruleMap = new LinkedHashMap<>();
 }

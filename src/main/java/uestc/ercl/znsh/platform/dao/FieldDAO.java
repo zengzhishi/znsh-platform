@@ -12,7 +12,7 @@ package uestc.ercl.znsh.platform.dao;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-import uestc.ercl.znsh.common.entity.Cluster;
+import uestc.ercl.znsh.common.entity.Field;
 import uestc.ercl.znsh.common.exception.ZNSH_DataAccessException;
 
 import java.util.List;
@@ -23,74 +23,74 @@ import java.util.stream.Collectors;
  * TODO 曾
  */
 @Repository
-public class ClusterDAO extends SuperDAO
+public class FieldDAO extends SuperDAO
 {
-    public ClusterDAO(JdbcTemplate jdbcTemplate)
+    public FieldDAO(JdbcTemplate jdbcTemplate)
     {
         super(jdbcTemplate);
     }
 
     /**
-     * 插入一个集群
+     * 插入一个字段
      *
-     * @param cluster 集群对象
+     * @param sheet 字段对象
      *
      * @return 操作是否成功
      *
      * @throws ZNSH_DataAccessException
      */
-    public boolean insert(Cluster cluster)
+    public boolean insert(Field sheet)
             throws ZNSH_DataAccessException
     {
-        if(cluster != null)
+        if(sheet != null)
         {
             //TODO 完善SQL，并去掉以下模拟功能代码
-            cluster.setPk(DB.clusterMap.size() + 1);
-            DB.clusterMap.put(cluster.getPk(), cluster);
+            sheet.setPk(DB.fieldMap.size() + 1);
+            DB.fieldMap.put(sheet.getPk(), sheet);
             return true;
         }
         return false;
     }
 
     /**
-     * 更新集群信息
+     * 更新字段信息
      *
-     * @param cluster 集群对象
+     * @param sheet 字段对象
      *
      * @return 操作是否成功
      *
      * @throws ZNSH_DataAccessException
      */
-    public boolean update(Cluster cluster)
+    public boolean update(Field sheet)
             throws ZNSH_DataAccessException
     {
-        if(cluster != null)
+        if(sheet != null)
         {
             //TODO 完善SQL，并去掉以下模拟功能代码
-            DB.clusterMap.put(cluster.getPk(), cluster);
+            DB.fieldMap.put(sheet.getPk(), sheet);
             return true;
         }
         return false;
     }
 
     /**
-     * 删除一组集群
+     * 删除一组字段
      *
      * @param pks 主键数组
      *
-     * @return 删除失败的集群的主键
+     * @return 删除失败的字段的主键
      *
      * @throws ZNSH_DataAccessException
      */
-    public Set<String> delete(int[] pks)
+    public Set<String> delete(long[] pks)
             throws ZNSH_DataAccessException
     {
         if(pks != null && pks.length > 0)
         {
             //TODO 完善SQL，并去掉以下模拟功能代码
-            for(int pk : pks)
+            for(long pk : pks)
             {
-                DB.clusterMap.remove(pk);
+                DB.fieldMap.remove(pk);
             }
             return null;
         }
@@ -98,43 +98,18 @@ public class ClusterDAO extends SuperDAO
     }
 
     /**
-     * 查询集群列表
+     * 查询字段列表
      *
-     * @param pk    主键文本（模糊匹配，null表示不限）
-     * @param name  名称（模糊匹配，null表示不限）
-     * @param desc  描述（模糊匹配，null表示不限）
-     * @param url   地址（模糊匹配，null表示不限）
-     * @param from  查询起始位置
-     * @param count 查询数量
+     * @param sheetPk 所属报表主键
      *
      * @return
      *
      * @throws ZNSH_DataAccessException
      */
-    public List<Cluster> select(String pk, String name, String desc, String url, long from, int count)
+    public List<Field> select(long sheetPk)
             throws ZNSH_DataAccessException
     {
         //TODO 完善SQL，并去掉以下模拟功能代码
-        return DB.clusterMap.values().stream().collect(Collectors.toList());
-    }
-
-    /**
-     * 检索一个集群
-     *
-     * @param pk 主键
-     *
-     * @return 集群对象
-     *
-     * @throws ZNSH_DataAccessException
-     */
-    public Cluster get(int pk)
-            throws ZNSH_DataAccessException
-    {
-        if(pk > 0)
-        {
-            //TODO 完善SQL，并去掉以下模拟功能代码
-            return DB.clusterMap.get(pk);
-        }
-        return null;
+        return DB.fieldMap.values().stream().collect(Collectors.toList());
     }
 }

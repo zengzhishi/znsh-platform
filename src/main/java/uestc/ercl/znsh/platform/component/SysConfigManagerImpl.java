@@ -16,8 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import uestc.ercl.znsh.common.entity.Config;
+import uestc.ercl.znsh.common.exception.ZNSH_IllegalArgumentException;
 import uestc.ercl.znsh.platform.component.def.SysConfigManager;
-import uestc.ercl.znsh.platform.constants.SysConfigName;
+import uestc.ercl.znsh.platform.constant.SysConfigName;
 import uestc.ercl.znsh.platform.dao.SysConfigDAO;
 
 import java.util.HashMap;
@@ -25,11 +26,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-/**
- * Created by sel on 16-10-26.
- */
 @Component
-public class SysConfigManagerImpl implements SysConfigManager
+public class SysConfigManagerImpl extends _SysLoggerHolder implements SysConfigManager
 {
     private final SysConfigDAO sysConfigDAO;
     private final Map<String, Config> cache = new HashMap<>();
@@ -37,38 +35,86 @@ public class SysConfigManagerImpl implements SysConfigManager
     @Autowired
     public SysConfigManagerImpl(SysConfigDAO sysConfigDAO)
     {
-        Assert.notNull(sysConfigDAO, "SysConfigDAO注入失败！不能为空！");
+        Assert.notNull(sysConfigDAO, "SysConfigDAO 注入失败！不能为空！");
         this.sysConfigDAO = sysConfigDAO;
     }
 
     @Override
-    public boolean set(@NonNull Config config)
+    public boolean set(@NonNull String name, String value)
+            throws ZNSH_IllegalArgumentException
     {
-        if(config != null)
+        if(JText.isNormal(name))
         {
-            cache.put(config.getName(), config);
-        }
-        return sysConfigDAO.insert(config);
-    }
-
-    @Override
-    public Config get(@NonNull String configName)
-    {
-        if(JText.isNormal(configName))
-        {
-            if(cache.keySet().contains(configName))
+            switch(name)
             {
-                return cache.get(configName);
+                case SysConfigName.TOKEN:
+                    return setToken(value);
+                case SysConfigName.PAGE_SIZE:
+                    return setPageSize(value);
+                case SysConfigName.VCODE_EXPIRES:
+                    return setVCodeExpires(value);
             }
-            return sysConfigDAO.select(configName);
         }
-        return null;
+        throw new ZNSH_IllegalArgumentException();
     }
 
     @Override
-    public List<Config> getList()
+    public boolean setToken(String value)
+            throws ZNSH_IllegalArgumentException
     {
-        return cache.values().stream().collect(Collectors.toList());
+        if(JText.isNormal(value))
+        {
+            Config config = new Config(SysConfigName.TOKEN, value);
+            cache.put(config.getName(), config);
+            return sysConfigDAO.insertOrUpdate(config);
+        }
+        throw new ZNSH_IllegalArgumentException("");
+    }
+
+    @Override
+    public boolean setPageSize(Object value)
+            throws ZNSH_IllegalArgumentException
+    {
+        int checkedValue;
+        if(value != null)
+        {
+            try
+            {
+                checkedValue = Integer.parseInt(String.valueOf(value));
+            } catch(NumberFormatException e)
+            {
+                throw new ZNSH_IllegalArgumentException("", e);
+            }
+        } else
+        {
+            checkedValue = 20;
+        }
+        Config config = new Config(SysConfigName.PAGE_SIZE, String.valueOf(checkedValue));
+        cache.put(config.getName(), config);
+        return sysConfigDAO.insertOrUpdate(config);
+    }
+
+    @Override
+    public boolean setVCodeExpires(Object value)
+            throws ZNSH_IllegalArgumentException
+    {
+        int checkedValue;
+        if(value != null)
+        {
+            try
+            {
+                checkedValue = Integer.parseInt(String.valueOf(value));
+            } catch(NumberFormatException e)
+            {
+                throw new ZNSH_IllegalArgumentException("", e);
+            }
+        } else
+        {
+            checkedValue = 60 * 3;
+        }
+        Config config = new Config(SysConfigName.VCODE_EXPIRES, String.valueOf(checkedValue));
+        cache.put(config.getName(), config);
+        return sysConfigDAO.insertOrUpdate(config);
     }
 
     @Override
@@ -79,7 +125,7 @@ public class SysConfigManagerImpl implements SysConfigManager
     }
 
     @Override
-    public Integer getPageSize()
+    public int getPageSize()
     {
         Config config = get(SysConfigName.PAGE_SIZE);
         if(config != null)
@@ -96,7 +142,7 @@ public class SysConfigManagerImpl implements SysConfigManager
     }
 
     @Override
-    public Integer getVCodeExpires()
+    public int getVCodeExpires()
     {
         Config config = get(SysConfigName.VCODE_EXPIRES);
         if(config != null)
@@ -110,5 +156,25 @@ public class SysConfigManagerImpl implements SysConfigManager
             }
         }
         return 60 * 3;
+    }
+
+    @Override
+    public Config get(@NonNull String name)
+    {
+        if(JText.isNormal(name))
+        {
+            if(cache.containsKey(name))
+            {
+                return cache.get(name);
+            }
+            return sysConfigDAO.select(name);
+        }
+        return null;
+    }
+
+    @Override
+    public List<Config> list()
+    {
+        return cache.values().stream().collect(Collectors.toList());
     }
 }

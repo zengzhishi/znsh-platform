@@ -41,22 +41,6 @@ public class AdminOfAppAuthenticator implements HandlerInterceptor
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView)
             throws Exception
     {
-        String requestMethod = request.getMethod();
-        response.setHeader("Access-Control-Allow-Methods", requestMethod);
-        switch(requestMethod)
-        {
-            case "GET":
-                response.setHeader("Access-Control-Allow-Origin", "*");
-                break;
-            case "POST":
-                response.setHeader("Access-Control-Allow-Origin", "*");
-                response.setHeader("Access-Control-Allow-Headers", "x-requested-with,content-type");
-                break;
-            case "PUT":
-                break;
-            case "DELETE":
-                break;
-        }
     }
 
     @Override

@@ -22,7 +22,7 @@ import java.util.Map;
  * Created by sel on 16-10-28.
  */
 @Component
-public class BakManagerImpl implements BakManager
+public class BakManagerImpl extends _SysLoggerHolder implements BakManager
 {
     @Override
     public Map<String, List<Sheet>> getAllAppSheets()

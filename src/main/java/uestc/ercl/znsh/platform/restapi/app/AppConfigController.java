@@ -24,7 +24,6 @@ import uestc.ercl.znsh.platform.restapi.BaseController;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Date;
 import java.util.List;
 
 @Controller
@@ -36,7 +35,7 @@ public class AppConfigController extends BaseController
     @Autowired
     public AppConfigController(AppManagerImpl appManager)
     {
-        Assert.notNull(appManager, "AppService注入失败！不能为空！");
+        Assert.notNull(appManager, "AppService 注入失败！不能为空！");
         this.appManager = appManager;
     }
 
@@ -53,7 +52,6 @@ public class AppConfigController extends BaseController
                 Config config = new Config();
                 config.setName(name);
                 config.setValue(value);
-                config.setDatetime(new Date());
                 boolean success = appManager.setConfig(appId, config);
                 if(success)
                 {

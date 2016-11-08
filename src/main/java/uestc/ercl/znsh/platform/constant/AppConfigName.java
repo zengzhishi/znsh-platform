@@ -8,23 +8,14 @@
  * 1、用于商业用途。
  * 2、修改或再发布。
  */
-package uestc.ercl.znsh.platform.constants;
+package uestc.ercl.znsh.platform.constant;
 
 /**
  * Created by sel on 16-10-25.
  */
-public class SysConfigName
+public class AppConfigName
 {
-    /**
-     * 系统TOKEN
-     */
     public static final String TOKEN = "TOKEN";
-    /**
-     * 系统管理后台数据列表页大小
-     */
     public static final String PAGE_SIZE = "PAGE_SIZE";
-    /**
-     * 动态验证码有效时长（秒）
-     */
-    public static final String VCODE_EXPIRES = "VCODE_EXPIRES";
+    public static final String TASK_LIMIT = "TASK_LIMIT";
 }

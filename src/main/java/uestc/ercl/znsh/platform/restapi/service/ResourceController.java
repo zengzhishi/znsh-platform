@@ -100,7 +100,7 @@ public class ResourceController extends BaseController
             app.setEmail("philshang@163.com");
             app.setPhone("18628960293");
             app.setPid("1234567890");
-            app.setAppType(AppType.CLOUD);
+            app.setType(AppType.CLOUD);
             return app;
         }
 
@@ -178,7 +178,7 @@ public class ResourceController extends BaseController
             f_id.setId("id");
             f_id.setName("编号");
             f_id.setDesc("课程编号");
-            f_id.setDataType(DataType.NUMBER);
+            f_id.setType(DataType.NUMBER);
             f_id.setNullable(false);
             //
             Field f_name = new Field();
@@ -186,7 +186,7 @@ public class ResourceController extends BaseController
             f_name.setId("name");
             f_name.setName("名称");
             f_name.setDesc("课程名称");
-            f_name.setDataType(DataType.TEXT);
+            f_name.setType(DataType.TEXT);
             f_name.setNullable(false);
             //
             Field f_max = new Field();
@@ -194,7 +194,7 @@ public class ResourceController extends BaseController
             f_max.setId("maxLearners");
             f_max.setName("最大人数");
             f_max.setDesc("该课程最多选课人数");
-            f_max.setDataType(DataType.NUMBER);
+            f_max.setType(DataType.NUMBER);
             f_max.setNullable(false);
             //
             Field f_cur = new Field();
@@ -202,7 +202,7 @@ public class ResourceController extends BaseController
             f_cur.setId("curLearners");
             f_cur.setName("当前人数");
             f_cur.setDesc("该课程当前选课人数");
-            f_cur.setDataType(DataType.NUMBER);
+            f_cur.setType(DataType.NUMBER);
             f_cur.setNullable(false);
             //
             Sheet t_cource = new Sheet();
@@ -220,7 +220,7 @@ public class ResourceController extends BaseController
             f_cid.setId("courseId");
             f_cid.setName("课程编号");
             f_cid.setDesc("选课申请中的课程编号");
-            f_cid.setDataType(DataType.NUMBER);
+            f_cid.setType(DataType.NUMBER);
             f_cid.setNullable(false);
             //
             Field f_sname = new Field();
@@ -228,7 +228,7 @@ public class ResourceController extends BaseController
             f_sname.setId("stuName");
             f_sname.setName("学生姓名");
             f_sname.setDesc("选课申请中的学生姓名");
-            f_sname.setDataType(DataType.TEXT);
+            f_sname.setType(DataType.TEXT);
             f_sname.setNullable(false);
             //
             Field f_grade = new Field();
@@ -236,7 +236,7 @@ public class ResourceController extends BaseController
             f_grade.setId("stuGrade");
             f_grade.setName("学生年级");
             f_grade.setDesc("选课申请中的学生所在的年级");
-            f_grade.setDataType(DataType.NUMBER);
+            f_grade.setType(DataType.NUMBER);
             f_grade.setNullable(false);
             //
             Field f_class = new Field();
@@ -244,7 +244,7 @@ public class ResourceController extends BaseController
             f_class.setId("stuClass");
             f_class.setName("学生班号");
             f_class.setDesc("选课申请中的学生所在的班");
-            f_class.setDataType(DataType.NUMBER);
+            f_class.setType(DataType.NUMBER);
             f_class.setNullable(false);
             //
             Sheet t_registry = new Sheet();

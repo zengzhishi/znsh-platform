@@ -32,21 +32,25 @@ import uestc.ercl.znsh.common.entity.Config;
 import uestc.ercl.znsh.common.exception.ZNSH_DataAccessException;
 import uestc.ercl.znsh.common.exception.ZNSH_IllegalArgumentException;
 import uestc.ercl.znsh.common.exception.ZNSH_ServiceException;
+import uestc.ercl.znsh.common.logging.LogType;
 import uestc.ercl.znsh.platform.component.def.AppManager;
 import uestc.ercl.znsh.platform.component.def.SysConfigManager;
 import uestc.ercl.znsh.platform.dao.AppConfigDAO;
 import uestc.ercl.znsh.platform.dao.AppDAO;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Component
-public class AppManagerImpl implements AppManager
+public class AppManagerImpl extends _SysLoggerHolder implements AppManager
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(AppManager.class);
     private static final int REQ_ID_CREATE = 0;
     private static final int REQ_ID_REMOVE = 1;
-    private static final int REQ_ID_SUSPEND = 2;
-    private static final int REQ_ID_ACTIVATE = 3;
+    private static final int REQ_ID_ACTIVATE = 2;
+    private static final int REQ_ID_SUSPEND = 3;
     private final HttpClient httpClient = HttpClient.getInstance();
     private final AppConfigDAO configDAO;
     private final AppDAO appDAO;
@@ -62,6 +66,17 @@ public class AppManagerImpl implements AppManager
         @Override
         protected void onSuccess(int requestId, HttpResponse httpResponse)
         {
+            switch(requestId)
+            {
+                case REQ_ID_CREATE:
+                    break;
+                case REQ_ID_REMOVE:
+                    break;
+                case REQ_ID_ACTIVATE:
+                    break;
+                case REQ_ID_SUSPEND:
+                    break;
+            }
         }
 
         @Override
@@ -78,9 +93,9 @@ public class AppManagerImpl implements AppManager
     @Autowired
     public AppManagerImpl(AppConfigDAO configDAO, AppDAO appDAO, SysConfigManager sysConfigManager)
     {
-        Assert.notNull(configDAO, "AppConfigDAO注入失败！不能为空！");
-        Assert.notNull(appDAO, "AppDAO注入失败！不能为空！");
-        Assert.notNull(sysConfigManager, "SysConfigManager注入失败！不能为空！");
+        Assert.notNull(configDAO, "AppConfigDAO 注入失败！不能为空！");
+        Assert.notNull(appDAO, "AppDAO 注入失败！不能为空！");
+        Assert.notNull(sysConfigManager, "SysConfigManager 注入失败！不能为空！");
         this.configDAO = configDAO;
         this.appDAO = appDAO;
         this.sysConfigManager = sysConfigManager;
@@ -109,8 +124,19 @@ public class AppManagerImpl implements AppManager
             @NonNull String pid, @NonNull String phone, @Nullable String email, @NonNull String account, @NonNull String password)
             throws ZNSH_IllegalArgumentException, ZNSH_ServiceException
     {
-        Date now = new Date();
-        App app = new App(newAppId(name), name, desc, type.value(), status.value(), now, now, master, pid, phone, email, account, password);
+        App app = new App();
+        app.setName(name);
+        app.setDesc(desc);
+        app.setType(type);
+        app.setStatus(status);
+        app.setMaster(master);
+        app.setPid(pid);
+        app.setPhone(phone);
+        app.setEmail(email);
+        app.setAccount(account);
+        app.setPassword(password);
+        app.setPk(newAppId(name));
+        app.setCreateTime(System.currentTimeMillis());
         try
         {
             if(appDAO.insert(app))
@@ -166,7 +192,7 @@ public class AppManagerImpl implements AppManager
 
     @Override
     public List<App> find(@Nullable String pk, @Nullable String name, @Nullable AppType type, @Nullable AppStatus status, @Nullable String master,
-            @Nullable String pid, @Nullable String phone, @Nullable String email, int from, int count)
+            @Nullable String pid, @Nullable String phone, @Nullable String email, long from, int count)
             throws ZNSH_IllegalArgumentException, ZNSH_ServiceException
     {
         if(from < 0)
@@ -193,14 +219,7 @@ public class AppManagerImpl implements AppManager
             throws ZNSH_IllegalArgumentException, ZNSH_ServiceException
     {
         App app = new App();
-        app.setPk(pk);
-        app.setName(name);
-        app.setDesc(desc);
-        app.setMaster(master);
-        app.setPid(pid);
-        app.setPhone(phone);
-        app.setEmail(email);
-        app.setAccount(account);
+        app.update(pk, name, desc, master, pid, phone, email, account);
         try
         {
             if(!appDAO.update(app))
@@ -220,8 +239,7 @@ public class AppManagerImpl implements AppManager
             throws ZNSH_IllegalArgumentException, ZNSH_ServiceException
     {
         App app = new App();
-        app.setPk(pk);
-        app.setPassword(password);
+        app.updatePassword(pk, password);
         try
         {
             if(!appDAO.update(app))
@@ -244,13 +262,28 @@ public class AppManagerImpl implements AppManager
             throw new ZNSH_IllegalArgumentException("未选择应用！");
         } else
         {
-            Map<String, String> fails = disable(pks);
+            //设置应用状态为永久禁用
+            Map<String, String> fails = new HashMap<>();
             try
             {
                 Set<String> set = appDAO.delete(pks);
+                if(set != null)
+                {
+                    set.forEach(pk->fails.put(pk, "删除信息失败！"));
+                }
             } catch(ZNSH_DataAccessException e)
             {
                 e.printStackTrace();
+            }
+            //通知所在集群移除该应用
+            Map<String, String> map = disable(pks);
+            if(map != null)
+            {
+                map.forEach((pk, error)->
+                {
+                    String origErr = fails.get(pk);
+                    fails.put(pk, origErr == null ? error : origErr + error);
+                });
             }
             return fails;
         }
@@ -260,198 +293,187 @@ public class AppManagerImpl implements AppManager
     public Map<String, String> setType(@NonNull AppType type, @NonNull String... pks)
             throws ZNSH_IllegalArgumentException, ZNSH_ServiceException
     {
-        if(type == null)
-        {
-            throw new ZNSH_IllegalArgumentException("未指定应用类型！");
-        } else if(pks == null || pks.length <= 0)
-        {
-            throw new ZNSH_IllegalArgumentException("未选择应用！");
-        } else
-        {
-            Map<String, String> fails = new HashMap<>();
-            List<App> apps = new ArrayList<>(pks.length);
-            for(String pk : pks)
-            {
-                App app = new App();
-                app.setPk(pk);
-                app.setAppType(type);
-                apps.add(app);
-            }
-            try
-            {
-                for(App app : apps)
-                {
-                    boolean success = appDAO.update(app);
-                }
-            } catch(ZNSH_DataAccessException e)
-            {
-                LOGGER.error("设置应用类型失败！", e);
-            }
-            return fails.isEmpty() ? null : fails;
-        }
+        throw new UnsupportedOperationException("暂不支持变更应用类型！");
+        //        if(type == null)
+        //        {
+        //            throw new ZNSH_IllegalArgumentException("未指定应用类型！");
+        //        } else if(pks == null || pks.length <= 0)
+        //        {
+        //            throw new ZNSH_IllegalArgumentException("未选择应用！");
+        //        } else
+        //        {
+        //            Map<String, String> fails = new HashMap<>();
+        //            List<App> apps = new ArrayList<>(pks.length);
+        //            for(String pk : pks)
+        //            {
+        //                App app = new App();
+        //                app.setPk(pk);
+        //                app.setAppType(type);
+        //                apps.add(app);
+        //            }
+        //            try
+        //            {
+        //                for(App app : apps)
+        //                {
+        //                    boolean success = appDAO.update(app);
+        //                }
+        //            } catch(ZNSH_DataAccessException e)
+        //            {
+        //                LOGGER.error("设置应用类型失败！", e);
+        //            }
+        //            return fails.isEmpty() ? null : fails;
+        //        }
     }
 
     @Override
     public Map<String, String> review(boolean accept, @NonNull String... pks)
             throws ZNSH_IllegalArgumentException, ZNSH_ServiceException
     {
-        if(pks == null || pks.length <= 0)
-        {
-            throw new ZNSH_IllegalArgumentException("未选择应用！");
-        } else
-        {
-            Map<String, String> fails = new HashMap<>();
-            List<App> apps = new ArrayList<>(pks.length);
-            for(String pk : pks)
-            {
-                App app = new App();
-                app.setPk(pk);
-                app.setAppStatus(accept ? AppStatus.NORMAL : AppStatus.DISABLED);
-                apps.add(app);
-            }
-            try
-            {
-                for(App app : apps)
-                {
-                    appDAO.update(app);
-                }
-            } catch(ZNSH_DataAccessException e)
-            {
-                LOGGER.error("审批应用失败！", e);
-            }
-            return fails.isEmpty() ? null : fails;
-        }
-    }
-
-    @Override
-    public Map<String, String> setCluster(Integer clusterPk, String... pks)
-            throws ZNSH_IllegalArgumentException, ZNSH_ServiceException
-    {
-        if(pks == null || pks.length <= 0)
-        {
-            throw new ZNSH_IllegalArgumentException("未选择应用！");
-        } else
-        {
-            Map<String, String> fails = new HashMap<>();
-            for(String pk : pks)
-            {
-            }
-            return fails.isEmpty() ? null : fails;
-        }
-    }
-
-    @Override
-    public Map<String, String> activate(@NonNull String... pks)
-            throws ZNSH_IllegalArgumentException, ZNSH_ServiceException
-    {
-        if(pks == null || pks.length <= 0)
-        {
-            throw new ZNSH_IllegalArgumentException("未选择应用！");
-        } else
-        {
-            Map<String, String> fails = new HashMap<>();
-            for(String pk : pks)
-            {
-                App app = new App();
-                app.setPk(pk);
-                app.setAppStatus(AppStatus.NORMAL);
-                try
-                {
-                    if(appDAO.update(app))
-                    {
-                        if(activateApp(pk))
-                        {
-                        } else
-                        {
-                            fails.put(pk, "激活服务失败");
-                        }
-                    } else
-                    {
-                        fails.put(pk, "激活服务失败");
-                    }
-                } catch(ZNSH_DataAccessException e)
-                {
-                }
-            }
-            return fails.isEmpty() ? null : fails;
-        }
-    }
-
-    @Override
-    public Map<String, String> suspend(@NonNull String... pks)
-            throws ZNSH_IllegalArgumentException, ZNSH_ServiceException
-    {
-        if(pks == null || pks.length <= 0)
-        {
-            throw new ZNSH_IllegalArgumentException("未选择应用！");
-        } else
-        {
-            Map<String, String> result = new HashMap<>();
-            for(String pk : pks)
-            {
-                App app = new App();
-                app.setPk(pk);
-                app.setAppStatus(AppStatus.SUSPEND);
-                try
-                {
-                    if(appDAO.update(app))
-                    {
-                        if(activateApp(pk))
-                        {
-                        } else
-                        {
-                            result.put(pk, "挂起服务失败");
-                        }
-                    } else
-                    {
-                        result.put(pk, "挂起服务失败");
-                    }
-                } catch(ZNSH_DataAccessException e)
-                {
-                }
-            }
-            return result.isEmpty() ? null : result;
-        }
+        return setStatus(Operation.REVIEW.withTag(accept ? 1 : 0), pks);
     }
 
     @Override
     public Map<String, String> disable(@NonNull String... pks)
             throws ZNSH_IllegalArgumentException, ZNSH_ServiceException
     {
+        return setStatus(Operation.DISABLE, pks);
+    }
+
+    @Override
+    public Map<String, String> activate(@NonNull String... pks)
+            throws ZNSH_IllegalArgumentException, ZNSH_ServiceException
+    {
+        return setStatus(Operation.ACTIVATE, pks);
+    }
+
+    @Override
+    public Map<String, String> suspend(@NonNull String... pks)
+            throws ZNSH_IllegalArgumentException, ZNSH_ServiceException
+    {
+        return setStatus(Operation.SUSPEND, pks);
+    }
+
+    @Override
+    public Map<String, String> start(@NonNull String... pks)
+            throws ZNSH_IllegalArgumentException, ZNSH_ServiceException
+    {
+        return setStatus(Operation.START, pks);
+    }
+
+    @Override
+    public Map<String, String> stop(@NonNull String... pks)
+            throws ZNSH_IllegalArgumentException, ZNSH_ServiceException
+    {
+        return setStatus(Operation.STOP, pks);
+    }
+
+    @Override
+    public Map<String, String> setCluster(int clusterPk, String... pks)
+            throws ZNSH_IllegalArgumentException, ZNSH_ServiceException
+    {
         if(pks == null || pks.length <= 0)
         {
             throw new ZNSH_IllegalArgumentException("未选择应用！");
-        } else
-        {
-            Map<String, String> result = new HashMap<>();
-            for(String pk : pks)
-            {
-                App app = new App();
-                app.setPk(pk);
-                app.setAppStatus(AppStatus.DISABLED);
-                try
-                {
-                    if(appDAO.update(app))
-                    {
-                        if(activateApp(pk))
-                        {
-                        } else
-                        {
-                            result.put(pk, "禁用服务失败");
-                        }
-                    } else
-                    {
-                        result.put(pk, "禁用服务失败");
-                    }
-                } catch(ZNSH_DataAccessException e)
-                {
-                }
-            }
-            return result.isEmpty() ? null : result;
         }
+        if(clusterPk < 1)
+        {
+            throw new ZNSH_IllegalArgumentException("集群编号不正确！");
+        }
+        Map<String, String> fails = null;
+        return fails.isEmpty() ? null : fails;
     }
 
-    public boolean registerApp(Object appResource)
+    private Map<String, String> setStatus(@NonNull Operation op, @NonNull String... pks)
+            throws ZNSH_IllegalArgumentException, ZNSH_ServiceException
+    {
+        if(pks == null || pks.length <= 0)
+        {
+            throw new ZNSH_IllegalArgumentException("未选择应用！");
+        }
+        String opName = op.name;
+        AppStatus newStatus;
+        AppCtlCmd ctlCmd;
+        switch(op)
+        {
+            case REVIEW:
+                newStatus = AppStatus.DISABLED;
+                ctlCmd = null;
+                break;
+            case DISABLE:
+                newStatus = AppStatus.DISABLED;
+                ctlCmd = AppCtlCmd.REMOVE;
+                break;
+            case ACTIVATE:
+                newStatus = AppStatus.NORMAL;
+                ctlCmd = AppCtlCmd.ACTIVATE;
+                break;
+            case SUSPEND:
+                newStatus = AppStatus.SUSPEND;
+                ctlCmd = AppCtlCmd.SUSPEND;
+                break;
+            case START:
+                newStatus = AppStatus.NORMAL;
+                ctlCmd = AppCtlCmd.CREATE;
+                break;
+            case STOP:
+                newStatus = null;
+                ctlCmd = AppCtlCmd.REMOVE;
+                break;
+            default:
+                throw new ZNSH_ServiceException("UNE");
+        }
+        Map<String, String> fails = new HashMap<>();
+        for(String pk : pks)
+        {
+            String errMsg = null;
+            try
+            {
+                App app = appDAO.get(pk);
+                if(app != null)
+                {
+                    if(newStatus != null)
+                    {
+                        app.updateStatus(app.appId(), newStatus);
+                    }
+                    try
+                    {
+                        if(newStatus == null || appDAO.update(app))
+                        {
+                            if(ctlCmd == null || !notifyAppCluster(pk, ctlCmd))
+                            {
+                                errMsg = "调整应用服务状态失败！";
+                            }
+                        } else
+                        {
+                            errMsg = String.format("更新应用状态'%s'失败！", newStatus);
+                        }
+                    } catch(ZNSH_DataAccessException e)
+                    {
+                        errMsg = "查询指定应用失败！";
+                    }
+                } else
+                {
+                    errMsg = "指定应用不存在！";
+                }
+            } catch(ZNSH_DataAccessException e)
+            {
+                errMsg = "查询指定应用失败！";
+            }
+            if(errMsg == null)
+            {
+                LOGGER.info("{}'{}'成功！", pk);
+                sysLogger.info(opName, String.format("成功（应用编号=%s）。", pk), LogType.SYS_MANAGE);
+            } else
+            {
+                LOGGER.error("{}'{}'失败！{}！", opName, pk, errMsg);
+                sysLogger.error(opName, String.format("失败（应用编号=%s）。", pk), LogType.SYS_MANAGE);
+                fails.put(pk, errMsg);
+            }
+        }
+        return fails.isEmpty() ? null : fails;
+    }
+
+    private boolean registerApp(Object appResource)
     {
         if(appResource != null)
         {
@@ -469,7 +491,7 @@ public class AppManagerImpl implements AppManager
         return false;
     }
 
-    public boolean removeApp(String appId)
+    private boolean notifyAppCluster(String appId, AppCtlCmd ctlCmd)
     {
         if(JText.isNormal(appId))
         {
@@ -477,42 +499,52 @@ public class AppManagerImpl implements AppManager
             RequestHolder requestHolder = httpClient.prepare();
             requestHolder.setHeader("TOKEN", sysConfigManager.getToken());
             requestHolder.setHeader("APP_ID", appId);
-            requestHolder.setHeader("CMD", AppCtlCmd.REMOVE.toString());
+            requestHolder.setHeader("CMD", ctlCmd.toString());
             requestHolder.post(REQ_ID_REMOVE, cluster.appCtlUrl(), handler);
         }
         return false;
     }
 
-    public boolean activateApp(String appId)
-    {
-        if(JText.isNormal(appId))
-        {
-            Cluster cluster = null;
-            RequestHolder requestHolder = httpClient.prepare();
-            requestHolder.setHeader("TOKEN", sysConfigManager.getToken());
-            requestHolder.setHeader("APP_ID", appId);
-            requestHolder.setHeader("CMD", AppCtlCmd.ACTIVATE.toString());
-            requestHolder.post(REQ_ID_ACTIVATE, cluster.appCtlUrl(), handler);
-        }
-        return false;
-    }
-
-    public boolean suspendApp(String appId)
-    {
-        if(JText.isNormal(appId))
-        {
-            Cluster cluster = null;
-            RequestHolder requestHolder = httpClient.prepare();
-            requestHolder.setHeader("TOKEN", sysConfigManager.getToken());
-            requestHolder.setHeader("APP_ID", appId);
-            requestHolder.setHeader("CMD", AppCtlCmd.SUSPEND.toString());
-            requestHolder.post(REQ_ID_SUSPEND, cluster.appCtlUrl(), handler);
-        }
-        return false;
-    }
-
+    /**
+     * 用于创建/注册应用时，生成编号
+     *
+     * @param name 应用名称
+     *
+     * @return 应用编号
+     */
     private String newAppId(String name)
     {
         return SecureUtil.getMD5_16(name);
+    }
+
+    private Object getAppResource(String appId)
+    {
+        return null;
+    }
+
+    private enum Operation
+    {
+        REVIEW("审批应用"),
+        DISABLE("注销应用"),
+        ACTIVATE("激活应用"),
+        SUSPEND("挂起应用"),
+        START("启动应用"),
+        STOP("停止应用");
+        String name;
+        /**
+         * 附加数据
+         */
+        int tag;
+
+        Operation(String name)
+        {
+            this.name = name;
+        }
+
+        private Operation withTag(int tag)
+        {
+            this.tag = tag;
+            return this;
+        }
     }
 }

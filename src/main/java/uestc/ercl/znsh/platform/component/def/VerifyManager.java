@@ -10,7 +10,7 @@
  */
 package uestc.ercl.znsh.platform.component.def;
 
-import uestc.ercl.znsh.platform.constants.VerifyCodeStatus;
+import uestc.ercl.znsh.platform.constant.VerifyCodeStatus;
 
 /**
  * Created by sel on 16-10-26.

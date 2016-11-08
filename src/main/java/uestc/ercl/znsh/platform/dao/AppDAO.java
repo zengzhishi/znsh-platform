@@ -48,7 +48,7 @@ public class AppDAO extends SuperDAO
     {
         if(app != null)
         {
-            //SQL
+            //TODO 完善SQL，并去掉以下模拟功能代码
             DB.appMap.put(app.getPk(), app);
             return true;
         }
@@ -69,7 +69,7 @@ public class AppDAO extends SuperDAO
     {
         if(app != null)
         {
-            //SQL
+            //TODO 完善SQL，并去掉以下模拟功能代码
             DB.appMap.put(app.getPk(), app);
             return true;
         }
@@ -90,7 +90,7 @@ public class AppDAO extends SuperDAO
     {
         if(pks != null && pks.length > 0)
         {
-            //SQL
+            //TODO 完善SQL，并去掉以下模拟功能代码
             for(String pk : pks)
             {
                 DB.appMap.remove(pk);
@@ -118,12 +118,12 @@ public class AppDAO extends SuperDAO
      *
      * @throws ZNSH_DataAccessException
      */
-    public List<App> select(String pk, String name, String master, String pid, String phone, String email, AppType type, AppStatus status, int from,
+    public List<App> select(String pk, String name, String master, String pid, String phone, String email, AppType type, AppStatus status, long from,
             int count)
             throws ZNSH_DataAccessException
     {
         List<App> list = new ArrayList<>();
-        //SQL
+        //TODO 完善SQL，并去掉以下模拟功能代码
         return DB.appMap.values().stream().collect(Collectors.toList());
     }
 
@@ -141,7 +141,7 @@ public class AppDAO extends SuperDAO
     {
         if(JText.isNormal(pk))
         {
-            //SQL
+            //TODO 完善SQL，并去掉以下模拟功能代码
             return DB.appMap.get(pk);
         }
         return null;
@@ -161,7 +161,7 @@ public class AppDAO extends SuperDAO
     {
         if(JText.isNormal(key))
         {
-            //SQL
+            //TODO 完善SQL，并去掉以下模拟功能代码
             for(App app : DB.appMap.values())
             {
                 if(app.getPk().equals(key) || app.getAccount().equals(key) || app.getPhone().equals(key) || app.getEmail().equals(key))

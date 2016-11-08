@@ -81,7 +81,7 @@ public interface AppManager extends AppConfigManager
      * @return 应用对象列表
      */
     List<App> find(@Nullable String pk, @Nullable String name, @Nullable AppType type, @Nullable AppStatus status, @Nullable String master,
-            @Nullable String pid, @Nullable String phone, @Nullable String email, int from, int count)
+            @Nullable String pid, @Nullable String phone, @Nullable String email, long from, int count)
             throws ZNSH_IllegalArgumentException, ZNSH_ServiceException;
 
     /**
@@ -135,7 +135,7 @@ public interface AppManager extends AppConfigManager
             throws ZNSH_IllegalArgumentException, ZNSH_ServiceException;
 
     /**
-     * 审核新应用（如批准，设置状态为{@link AppStatus#NORMAL}；否则设为{@link AppStatus#DISABLED}）
+     * 审核新应用（如批准，设置应用状态为{@link AppStatus#NORMAL}；否则设为{@link AppStatus#DISABLED}）
      *
      * @param accept 批准与否
      * @param pks    主键（应用编号）序列
@@ -146,18 +146,17 @@ public interface AppManager extends AppConfigManager
             throws ZNSH_IllegalArgumentException, ZNSH_ServiceException;
 
     /**
-     * 分配服务集群（通知原集群移除该应用、新集群添加该应用）
+     * 注销应用（设置应用状态为{@link AppStatus#DISABLED}，并通知服务集群移除该应用）
      *
-     * @param clusterPk 集群编号
-     * @param pks       主键（应用编号）序列
+     * @param pks 主键（应用编号）序列
      *
      * @return null-成功/else-失败项的pk及原因
      */
-    Map<String, String> setCluster(Integer clusterPk, String... pks)
+    Map<String, String> disable(@NonNull String... pks)
             throws ZNSH_IllegalArgumentException, ZNSH_ServiceException;
 
     /**
-     * 激活应用（设置状态为{@link AppStatus#NORMAL}，并通知服务集群恢复对该应用的服务）
+     * 激活应用（设置应用状态为{@link AppStatus#NORMAL}，并通知服务集群恢复对该应用的服务）
      *
      * @param pks 主键（应用编号）序列
      *
@@ -167,7 +166,7 @@ public interface AppManager extends AppConfigManager
             throws ZNSH_IllegalArgumentException, ZNSH_ServiceException;
 
     /**
-     * 挂起应用（设置状态为{@link AppStatus#SUSPEND}，并通知服务集群暂停对该应用的服务）
+     * 挂起应用（设置应用状态为{@link AppStatus#SUSPEND}，并通知服务集群暂停对该应用的服务）
      *
      * @param pks 主键（应用编号）序列
      *
@@ -177,12 +176,33 @@ public interface AppManager extends AppConfigManager
             throws ZNSH_IllegalArgumentException, ZNSH_ServiceException;
 
     /**
-     * 注销应用（设置状态为{@link AppStatus#DISABLED}，并通知服务集群移除该应用）
+     * 启动应用（设置应用状态为{@link AppStatus#NORMAL}，通知服务集群增加该应用）
      *
      * @param pks 主键（应用编号）序列
      *
      * @return null-成功/else-失败项的pk及原因
      */
-    Map<String, String> disable(@NonNull String... pks)
+    Map<String, String> start(@NonNull String... pks)
+            throws ZNSH_IllegalArgumentException, ZNSH_ServiceException;
+
+    /**
+     * 停止应用（不改变应用状态，通知服务集群移除该应用）
+     *
+     * @param pks 主键（应用编号）序列
+     *
+     * @return null-成功/else-失败项的pk及原因
+     */
+    Map<String, String> stop(@NonNull String... pks)
+            throws ZNSH_IllegalArgumentException, ZNSH_ServiceException;
+
+    /**
+     * 分配服务集群（通知原集群移除该应用、新集群添加该应用）
+     *
+     * @param clusterPk 集群编号
+     * @param pks       主键（应用编号）序列
+     *
+     * @return null-成功/else-失败项的pk及原因
+     */
+    Map<String, String> setCluster(int clusterPk, String... pks)
             throws ZNSH_IllegalArgumentException, ZNSH_ServiceException;
 }

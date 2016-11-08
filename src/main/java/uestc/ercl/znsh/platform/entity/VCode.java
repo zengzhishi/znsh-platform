@@ -83,13 +83,13 @@ public class VCode
         return createTime;
     }
 
-    public void setCreateTime(long createTime)
-    {
-        this.createTime = createTime;
-    }
-
     public void setCreateTime(Date createTime)
     {
         this.createTime = createTime.getTime();
+    }
+
+    public void setCreateTime(long createTime)
+    {
+        this.createTime = createTime;
     }
 }

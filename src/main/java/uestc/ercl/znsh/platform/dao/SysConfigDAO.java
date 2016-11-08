@@ -27,7 +27,7 @@ public class SysConfigDAO extends SuperDAO
         super(jdbcTemplate);
     }
 
-    public boolean insert(Config config)
+    public boolean insertOrUpdate(Config config)
     {
         return false;
     }

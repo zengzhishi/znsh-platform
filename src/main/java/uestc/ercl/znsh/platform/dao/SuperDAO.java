@@ -26,7 +26,7 @@ public abstract class SuperDAO
     @Autowired
     public SuperDAO(JdbcTemplate jdbcTemplate)
     {
-        Assert.notNull(jdbcTemplate, "JdbcTemplate注入失败！不能为空！");
+        Assert.notNull(jdbcTemplate, "JdbcTemplate 注入失败！不能为空！");
         this.jdbcTemplate = jdbcTemplate;
     }
 

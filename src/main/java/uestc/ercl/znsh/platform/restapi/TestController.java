@@ -28,7 +28,7 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * 数据备份接口
+ * 测试接口（用于检测程序是否部署成功）
  *
  * @apiNote 仅用于服务集群上传备份数据
  */
@@ -85,10 +85,9 @@ public class TestController extends BaseController
         app.setPk("pkpkpk");
         app.setName("TestApp");
         app.setDesc("测试应用");
-        app.setAppType(AppType.CLOUD);
-        app.setAppStatus(AppStatus.NORMAL);
+        app.setType(AppType.CLOUD);
+        app.setStatus(AppStatus.NORMAL);
         app.setCreateTime(System.currentTimeMillis());
-        app.setUpdateTime(System.currentTimeMillis());
         app.setMaster("master");
         app.setPid("pid");
         app.setPhone("phone");

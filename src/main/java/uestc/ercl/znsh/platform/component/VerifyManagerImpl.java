@@ -16,13 +16,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import uestc.ercl.znsh.platform.component.def.VerifyManager;
-import uestc.ercl.znsh.platform.constants.VerifyCodeStatus;
+import uestc.ercl.znsh.platform.constant.VerifyCodeStatus;
 import uestc.ercl.znsh.platform.dao.VerifyCodeDAO;
 import uestc.ercl.znsh.platform.entity.VCode;
 import uestc.ercl.znsh.platform.util.Notifier;
 
 @Component
-public class VerifyManagerImpl implements VerifyManager
+public class VerifyManagerImpl extends _SysLoggerHolder implements VerifyManager
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(VerifyManager.class);
     private final VerifyCodeDAO verifyCodeDAO;

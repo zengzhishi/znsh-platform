@@ -33,7 +33,7 @@ import java.util.List;
  * 应用管理接口
  */
 @Controller
-@RequestMapping(path = "api/admin")
+@RequestMapping(path = "api/admin/cluster")
 public class ClusterController extends BaseController
 {
     private final ClusterManager clusterManager;
@@ -41,12 +41,12 @@ public class ClusterController extends BaseController
     @Autowired
     public ClusterController(ClusterManagerImpl clusterManager)
     {
-        Assert.notNull(clusterManager, "ClusterService注入失败！不能为空！");
+        Assert.notNull(clusterManager, "ClusterService 注入失败！不能为空！");
         this.clusterManager = clusterManager;
     }
 
     @ResponseBody
-    @RequestMapping(path = "cluster", method = RequestMethod.POST)
+    @RequestMapping(method = RequestMethod.POST, produces = "text/plain;charset=UTF-8")
     public String create(HttpServletRequest request, HttpServletResponse response, @RequestParam String name, String desc, String url)
             throws IOException
     {
@@ -65,9 +65,9 @@ public class ClusterController extends BaseController
     }
 
     @ResponseBody
-    @RequestMapping(path = "cluster", method = RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.GET)
     public List<Cluster> retrieve(HttpServletRequest request, HttpServletResponse response, String pk, String name, String desc, String url,
-            @RequestParam(defaultValue = "0") Integer from, @RequestParam(defaultValue = "20") Integer count)
+            @RequestParam(defaultValue = "0") Long from, @RequestParam(defaultValue = "20") Integer count)
             throws IOException
     {
         try
@@ -84,7 +84,7 @@ public class ClusterController extends BaseController
     }
 
     @ResponseBody
-    @RequestMapping(path = "cluster", method = RequestMethod.PUT)
+    @RequestMapping(method = RequestMethod.PUT, produces = "text/plain;charset=UTF-8")
     public String update(HttpServletRequest request, HttpServletResponse response, @RequestParam Integer pk, String name, String desc, String url)
             throws IOException
     {
@@ -103,7 +103,7 @@ public class ClusterController extends BaseController
     }
 
     @ResponseBody
-    @RequestMapping(path = "cluster", method = RequestMethod.DELETE)
+    @RequestMapping(method = RequestMethod.DELETE, produces = "text/plain;charset=UTF-8")
     public String delete(HttpServletRequest request, HttpServletResponse response, @RequestParam String pks)
             throws IOException
     {

@@ -25,18 +25,15 @@ import uestc.ercl.znsh.platform.dao.RuleDAO;
 
 import java.util.Objects;
 
-/**
- * 规则管理工类（需要借助DAO实现）
- */
 @Component
-public class RuleManagerImpl implements RuleManager
+public class RuleManagerImpl extends _SysLoggerHolder implements RuleManager
 {
-    private final RuleDAO dao;
+    private final RuleDAO ruleDAO;
 
     public RuleManagerImpl(RuleDAO ruleDAO)
     {
-        Objects.requireNonNull(ruleDAO, "规则DAO不能为空！");
-        this.dao = ruleDAO;
+        Objects.requireNonNull(ruleDAO, "RuleDAO 注入失败！不能为空！");
+        this.ruleDAO = ruleDAO;
     }
 
     /**
@@ -85,11 +82,10 @@ public class RuleManagerImpl implements RuleManager
             throws ZNSH_InternalException, ZNSH_IllegalArgumentException
     {
         String pk = jsonNode.get("pk").asText("");
-        Rule rule = dao.select(pk);
+        Rule rule = ruleDAO.select(pk);
         if(rule != null)
         {
             setRuleFields(rule, jsonNode);
-            rule.setUpdateTime(System.currentTimeMillis());
         } else
         {
             throw new ZNSH_DataAccessException(String.format("不存在主键为'%s'的规则！", pk));
